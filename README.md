@@ -6,7 +6,7 @@ Farmers and customers use the mobile app (same Supabase project).
 ## Step 1 — Setup (15 min)
 
 1. **Create Supabase project** → supabase.com → New project (region: closest, e.g. Mumbai/Singapore).
-2. **Run the SQL**: Dashboard → SQL Editor → New query → paste `supabase/01_user_management.sql` → Run.
+2. **Run the SQL** in order: Dashboard → SQL Editor → run each file in `supabase/` (`01_…`, `02_…`, `03_…`).
 3. **Turn off email confirmation (for dev/demo speed)**: Authentication → Sign In / Providers → Email → disable "Confirm email".
 4. **Env keys**: Project Settings → API → copy URL + anon/publishable key into `.env`:
    ```

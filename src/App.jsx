@@ -12,6 +12,7 @@ import Pending from './pages/auth/Pending'
 import MobileOnly from './pages/auth/MobileOnly'
 import AdminHome from './pages/admin/AdminHome'
 import Approvals from './pages/admin/Approvals'
+import Users from './pages/admin/Users'
 import ManagerHome from './pages/manager/ManagerHome'
 import BusinessHome from './pages/business/BusinessHome'
 
@@ -42,6 +43,7 @@ export default function App() {
             <Route path="/admin" element={<DashboardLayout />}>
               <Route index element={<AdminHome />} />
               <Route path="approvals" element={<Approvals />} />
+              <Route path="users" element={<Users />} />
               <Route path="*" element={<ModuleSoon />} />
             </Route>
           </Route>

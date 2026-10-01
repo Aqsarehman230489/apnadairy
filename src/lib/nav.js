@@ -3,7 +3,7 @@ export const navFor = {
   super_admin: [
     { to: '/admin', label: 'Overview', icon: 'grid', end: true, ready: true },
     { to: '/admin/approvals', label: 'Approvals', icon: 'check', ready: true },
-    { to: '/admin/users', label: 'Users', icon: 'users' },
+    { to: '/admin/users', label: 'Users', icon: 'users', ready: true },
     { to: '/admin/iot-devices', label: 'IoT Devices', icon: 'chip' },
     { to: '/admin/pricing', label: 'Dynamic Pricing', icon: 'tag' },
     { to: '/admin/complaints', label: 'Complaints & Support', icon: 'chat' },

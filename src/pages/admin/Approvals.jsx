@@ -2,6 +2,8 @@ import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../../lib/supabase'
 import PageHeader from '../../components/PageHeader'
 import Alert from '../../components/Alert'
+import DocsDrawer from '../../components/DocsDrawer'
+import { hasRequiredDocs } from '../../lib/docs'
 
 const tabs = [
   { id: 'area_manager', label: 'Area Managers', table: 'area_managers', fk: 'area_managers_user_id_fkey' },
@@ -22,6 +24,8 @@ export default function Approvals() {
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [docsByUser, setDocsByUser] = useState({})
+  const [viewing, setViewing] = useState(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -32,6 +36,15 @@ export default function Approvals() {
       .order('created_at', { ascending: false })
     setError(error?.message ?? '')
     setRows(data ?? [])
+
+    // document counts for the listed applicants
+    const ids = (data ?? []).map((r) => r.user_id)
+    if (ids.length) {
+      const { data: docs } = await supabase.from('verification_documents').select('user_id, doc_type').in('user_id', ids)
+      const grouped = {}
+      ;(docs ?? []).forEach((d) => { (grouped[d.user_id] ??= []).push(d) })
+      setDocsByUser(grouped)
+    }
     setLoading(false)
   }, [tab, status])
 
@@ -80,15 +93,16 @@ export default function Approvals() {
               <th className="px-5 py-3 font-medium">{tab.id === 'area_manager' ? 'Center' : 'Business'}</th>
               <th className="px-5 py-3 font-medium">Owner</th>
               <th className="px-5 py-3 font-medium">City</th>
+              <th className="px-5 py-3 font-medium">Documents</th>
               <th className="px-5 py-3 font-medium">Applied</th>
               <th className="px-5 py-3 font-medium">Status</th>
               <th className="px-5 py-3 font-medium text-right">Action</th>
             </tr>
           </thead>
           <tbody>
-            {loading && <tr><td colSpan={6} className="px-5 py-10 text-center text-muted">Loading…</td></tr>}
+            {loading && <tr><td colSpan={7} className="px-5 py-10 text-center text-muted">Loading…</td></tr>}
             {!loading && rows.length === 0 && (
-              <tr><td colSpan={6} className="px-5 py-10 text-center text-muted">No {status} applications.</td></tr>
+              <tr><td colSpan={7} className="px-5 py-10 text-center text-muted">No {status} applications.</td></tr>
             )}
             {!loading && rows.map((r) => (
               <tr key={r.id} className="border-b border-line/60 last:border-0">
@@ -103,6 +117,19 @@ export default function Approvals() {
                   <p className="font-mono text-[11px] text-muted">{r.profile?.email} · {r.profile?.phone}</p>
                 </td>
                 <td className="px-5 py-4">{r.city}</td>
+                <td className="px-5 py-4">
+                  {(() => {
+                    const docs = docsByUser[r.user_id] ?? []
+                    const ok = tab.id !== 'area_manager' || hasRequiredDocs(docs)
+                    return (
+                      <button onClick={() => setViewing(r)} className="flex items-center gap-2 text-left hover:underline">
+                        <span className={`h-2 w-2 rounded-full ${docs.length === 0 ? 'bg-danger' : ok ? 'bg-forest-2' : 'bg-amber'}`} />
+                        <span className="text-xs">{docs.length} file{docs.length === 1 ? '' : 's'}</span>
+                        {!ok && <span className="font-mono text-[10px] uppercase text-amber">incomplete</span>}
+                      </button>
+                    )
+                  })()}
+                </td>
                 <td className="px-5 py-4 font-mono text-xs text-muted">{new Date(r.created_at).toLocaleDateString()}</td>
                 <td className="px-5 py-4">
                   <span className={`rounded-full px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider ${badge[r.verification_status]}`}>
@@ -127,6 +154,8 @@ export default function Approvals() {
           </tbody>
         </table>
       </div>
+
+      {viewing && <DocsDrawer row={viewing} onClose={() => setViewing(null)} />}
     </>
   )
 }

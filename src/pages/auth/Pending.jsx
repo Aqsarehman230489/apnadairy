@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext'
 import { homeFor, roleLabel } from '../../lib/roles'
 import AuthShell from '../../components/AuthShell'
 import Loader from '../../components/Loader'
+import DocumentUpload from '../../components/DocumentUpload'
 
 const copy = {
   pending: ['Under review', 'Your account is waiting for approval by the ApnaDairy admin. You will get access as soon as it is verified.'],
@@ -26,6 +27,9 @@ export default function Pending() {
         </div>
         <p className="mt-3 text-sm leading-relaxed text-ink">{body}</p>
       </div>
+      {profile.status === 'pending' && ['area_manager', 'business'].includes(profile.role) && (
+        <div className="mt-4"><DocumentUpload profile={profile} /></div>
+      )}
       <div className="mt-6 grid grid-cols-2 gap-3">
         <button onClick={refreshProfile} className="btn-primary">Check again</button>
         <button onClick={signOut} className="h-[46px] rounded-[10px] border border-line text-sm font-semibold hover:bg-cream-2">Sign out</button>

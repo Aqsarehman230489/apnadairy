@@ -69,7 +69,7 @@ function man(o = {}) {
     ${head({ ...o, skin })}
     ${arm(22, -162, o.armR ?? -8, k, skin, o.holdR || '')}`
   const bob = o.walk ? -Math.abs(Math.sin(o.walk)) * 5 : Math.sin(T * 2.4 + (o.seed || 0)) * 1.3
-  return g(`translate(${o.x || 0} ${o.y || 0}) scale(${o.flip ? -(o.s || 1) : o.s || 1} ${o.s || 1})`, g(`translate(0 ${(o.bounce || 0) + bob})`, body))
+  return g(`translate(${o.x || 0} ${o.y || 0}) scale(${o.flip ? -(o.s || 1) : o.s || 1} ${o.s || 1})`, `<ellipse cx="0" cy="1" rx="${o.shadowW || 36}" ry="7" fill="#1e2b22" opacity="${o.noShadow || o.noLegs ? 0 : 0.14}"/>` + g(`translate(0 ${(o.bounce || 0) + bob})`, body))
 }
 
 // woman in shalwar kameez with dupatta over her head and shoulders
@@ -87,13 +87,14 @@ function woman(o = {}) {
     <path d="M-24 -190 Q-24 -222 0 -222 Q22 -222 21 -200 Q12 -212 -2 -211 Q-16 -208 -16 -186 L-18 -150 L-30 -60 L-38 -64 L-28 -160 Z" fill="${d}"/>
     <path d="M21 -200 Q26 -180 24 -164 Q10 -160 -2 -168" fill="none" stroke="${d}" stroke-width="7" stroke-linecap="round"/>
     ${arm(20, -160, o.armR ?? -10, k, skin, o.holdR || '')}`
-  return g(`translate(${o.x || 0} ${(o.y || 0) + (o.hop || 0) + Math.sin(T * 2.2 + (o.seed || 2)) * 1.2}) scale(${o.flip ? -(o.s || 1) : o.s || 1} ${o.s || 1})`, body)
+  return g(`translate(${o.x || 0} ${o.y || 0}) scale(${o.flip ? -(o.s || 1) : o.s || 1} ${o.s || 1})`, `<ellipse cx="0" cy="1" rx="${o.shadowW || 36}" ry="7" fill="#1e2b22" opacity="${o.noShadow ? 0 : 0.14}"/>` + g(`translate(0 ${(o.hop || 0) + Math.sin(T * 2.2 + (o.seed || 2)) * 1.2})`, body))
 }
 
 // ---------- animals & props ----------
 function buffalo(x, y, s = 1, chew = 0, flip = false) {
   const hb = Math.sin(chew) * 3
   return g(`translate(${x} ${y}) scale(${flip ? -s : s} ${s})`, `
+    <ellipse cx="10" cy="2" rx="110" ry="10" fill="#1e2b22" opacity=".14"/>
     <rect x="-70" y="-60" width="16" height="60" rx="5" fill="#262626"/><rect x="-40" y="-60" width="16" height="60" rx="5" fill="#2e2e2e"/>
     <rect x="30" y="-60" width="16" height="60" rx="5" fill="#262626"/><rect x="55" y="-60" width="16" height="60" rx="5" fill="#2e2e2e"/>
     <ellipse cx="0" cy="-80" rx="92" ry="46" fill="#333"/>
@@ -109,6 +110,7 @@ function buffalo(x, y, s = 1, chew = 0, flip = false) {
 function churn(x, y, s = 1, fill = 0, label = '') {
   return g(`translate(${x} ${y}) scale(${s})`, `
     <defs><linearGradient id="st" x1="0" x2="1"><stop offset="0" stop-color="#9aa3a8"/><stop offset=".45" stop-color="#eef1f2"/><stop offset="1" stop-color="#8e979c"/></linearGradient></defs>
+    <ellipse cx="0" cy="1" rx="34" ry="5" fill="#1e2b22" opacity=".14"/>
     <rect x="-16" y="-96" width="32" height="10" rx="3" fill="#8e979c"/>
     <rect x="-11" y="-86" width="22" height="14" fill="url(#st)"/>
     <path d="M-11 -72 L-30 -54 L-30 -6 Q-30 0 -24 0 L24 0 Q30 0 30 -6 L30 -54 L11 -72 Z" fill="url(#st)"/>
@@ -159,6 +161,7 @@ function loader(x, y, s, t, churns = 3, driver = true) {
   let load = ''
   for (let i = 0; i < churns; i++) load += churn(-150 + i * 46, -48, 0.62)
   return g(`translate(${x} ${y}) scale(${s})`, `
+    <ellipse cx="-55" cy="10" rx="150" ry="9" fill="#1e2b22" opacity=".16"/>
     <rect x="-190" y="-58" width="160" height="40" rx="4" fill="#2d6b8a"/>
     <rect x="-190" y="-62" width="160" height="8" fill="${C.haldi}"/>
     ${[0, 1, 2, 3, 4, 5, 6].map((i) => `<circle cx="${-180 + i * 24}" cy="-36" r="5" fill="${['#d9445a', '#f2c14e', '#3fa37b', '#f08a3c'][i % 4]}"/>`).join('')}

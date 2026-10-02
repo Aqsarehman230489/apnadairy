@@ -5,14 +5,17 @@ from scipy.io import wavfile
 from scipy.signal import butter, sosfilt, lfilter
 
 SR = 44100
-DUR = 69.0
+OFFSET = 3.5  # the opening title card plays before the story
+DUR = 69.0 + OFFSET
 N = int(SR * DUR)
 rng = np.random.default_rng(7)
 music = np.zeros(N)
 sfx = np.zeros(N)
 
 def add(buf, t0, sig, gain=1.0):
-    i = int(t0 * SR)
+    # story times are written as in the original 69 s cut; OFFSET shifts them after the title
+    i = int((t0 + OFFSET) * SR)
+    if i < 0: sig = sig[-i:]; i = 0
     if i >= N: return
     j = min(N, i + len(sig))
     buf[i:j] += sig[: j - i] * gain
@@ -63,7 +66,7 @@ root = 196.0  # G3, a calm morning key
 # yaman-like scale: sa re ga ma(teevra) pa dha ni
 scale = [0, 2, 4, 6, 7, 9, 11, 12, 14, 16]
 semi = lambda s: root * 2 ** (s / 12)
-add(music, 0, tanpura(0, DUR, root))
+add(music, -OFFSET, tanpura(0, DUR, root))
 
 bpm = 88; beat = 60 / bpm
 # melody phrases (scale degree, beats), repeated with small variations
@@ -193,11 +196,18 @@ chime(57.2, (784, 988, 1175), 0.15)
 # end card swell
 whoosh(62.1, 0.8, 0.08)
 
+# ---------- opening title ----------
+# a slow rising phrase as "Farm se ghar tak" appears, then a soft chime under the urdu line
+for k, deg in enumerate([0, 2, 4, 7]):
+    add(music, -OFFSET + 0.3 + k * 0.17, pluck(semi(scale[deg]), 2.6), 0.30)
+chime(-OFFSET + 0.9, (784, 1175), 0.07)
+whoosh(-0.4, 0.9, 0.05)
+
 # ---------- mix ----------
 # duck the music a little under busy effect moments
 duck = np.ones(N)
 for a, b in [(3.1, 7.4), (27, 32.5), (38.8, 41), (44.6, 49.6)]:
-    i, j = int(a * SR), int(b * SR)
+    i, j = int((a + OFFSET) * SR), int((b + OFFSET) * SR)
     duck[i:j] = 0.75
 duck = lp(duck, 3)
 mix = music * duck + sfx

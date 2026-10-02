@@ -1,6 +1,7 @@
 // ApnaDairy farm-to-home animation — scenes and timeline. render(t) draws frame at time t (seconds).
 const SCENES = [[0, 9], [9, 17], [17, 25.5], [25.5, 34.5], [34.5, 43], [43, 51.5], [51.5, 62], [62, 69]]
-const DURATION = 69
+const INTRO = 3.5 // opening title card before the story
+const DURATION = 69 + INTRO
 
 const handPos = (sx, sy, s, angle, flip = false) => {
   const r = (angle * Math.PI) / 180
@@ -157,7 +158,7 @@ function scene4(t) {
   <rect x="740" y="90" width="460" height="560" rx="34" fill="#1d2326"/>
   <rect x="758" y="108" width="424" height="524" rx="22" fill="${C.malai}"/>
   <text x="784" y="158" font-size="24" font-weight="800" fill="${C.deep}">Milk test</text>
-  <text x="784" y="186" font-size="16" fill="#6a6f5f">Ghulam Rasool · 40 L buffalo milk</text>
+  <text x="784" y="186" font-size="16" fill="#6a6f5f">Ghulam Rasool, 40 L buffalo milk</text>
   ${rows.map(([k, v], i) => `<g opacity="${seg(lt, 1.3 + i * 0.4, 1.8 + i * 0.4)}"><rect x="784" y="${212 + i * 74}" width="372" height="62" rx="16" fill="${C.cream}"/>
     <text x="804" y="${250 + i * 74}" font-size="19" fill="#6a6f5f">${k}</text><text x="1136" y="${251 + i * 74}" text-anchor="end" font-size="23" font-weight="800" fill="${C.deep}">${v}</text></g>`).join('')}
   <rect x="784" y="520" width="372" height="12" rx="6" fill="${C.cream}"/><rect x="784" y="520" width="${372 * p}" height="12" rx="6" fill="${C.forest}"/>
@@ -189,7 +190,7 @@ function scene5(t) {
     <text x="0" y="74" text-anchor="middle" font-size="22" font-weight="800" fill="${lt > 4.3 ? C.deep : C.cream}">${lt > 4.3 ? 'Accepted ✓' : 'Accept'}</text>`, `opacity="${cardA}"`) : ''}
   ${bubble(120, 360, 'Theek hai, manzoor!', seg(lt, 2.4, 2.8) - seg(lt, 5, 5.3))}
   ${paid > 0 ? g(`translate(640 ${lerp(720, 520, easeOut(paid))})`, `<rect x="-230" y="-40" width="460" height="80" rx="24" fill="${C.deep}"/><circle cx="-186" cy="0" r="20" fill="${C.haldi}"/><text x="-186" y="7" text-anchor="middle" font-size="20" font-weight="800" fill="${C.deep}">✓</text>
-    <text x="-152" y="-6" font-size="21" font-weight="800" fill="${C.cream}">Rs ${Math.round(7400 * easeOut(seg(lt, 4.9, 6))).toLocaleString('en-PK')} paid to Ghulam Rasool</text><text x="-152" y="20" font-size="16" fill="${C.cream}" opacity=".7">Mobile wallet · just now</text>`) : ''}
+    <text x="-152" y="-6" font-size="21" font-weight="800" fill="${C.cream}">Rs ${Math.round(7400 * easeOut(seg(lt, 4.9, 6))).toLocaleString('en-PK')} paid to Ghulam Rasool</text><text x="-152" y="20" font-size="16" fill="${C.cream}" opacity=".7">Mobile wallet, just now</text>`) : ''}
   ${coins}
   <!--cap-->${caption(t, 5, 'Munasib qeemat, foran adaigi', 'A fair price, paid on the spot', 34.5, 43)}`
 }
@@ -209,25 +210,25 @@ function scene6(t) {
   <rect x="100" y="130" width="290" height="400" rx="14" fill="#cfe8f0"/>
   ${[0, 1, 2].map((i) => churn(170 + i * 76, 300, 0.95)).join('')}
   ${[0, 1, 2].map((i) => churn(170 + i * 76, 500, 0.95)).join('')}
-  ${batchA > 0 ? g(`translate(245 ${lerp(640, 600, easeOut(batchA))})`, `<rect x="-170" y="-34" width="340" height="68" rx="20" fill="${C.haldi}"/><text x="0" y="-6" text-anchor="middle" font-size="20" font-weight="800" fill="${C.deep}">Batch AD-1042 · 40 L</text><text x="0" y="20" text-anchor="middle" font-size="16" fill="${C.deep}">Farm fresh · tested · traced</text>`, `opacity="${batchA}"`) : ''}
+  ${batchA > 0 ? g(`translate(245 ${lerp(640, 600, easeOut(batchA))})`, `<rect x="-170" y="-34" width="340" height="68" rx="20" fill="${C.haldi}"/><text x="0" y="-6" text-anchor="middle" font-size="20" font-weight="800" fill="${C.deep}">Batch 1042, 40 litres</text><text x="0" y="20" text-anchor="middle" font-size="16" fill="${C.deep}">Farm fresh, tested, traced</text>`, `opacity="${batchA}"`) : ''}
   <!-- phone with bulk request -->
   <rect x="520" y="60" width="330" height="610" rx="44" fill="#151a1c"/>
   <rect x="536" y="76" width="298" height="578" rx="32" fill="${C.cream}"/>
   <text x="560" y="130" font-size="16" fill="#6a6f5f">Bulk request</text>
   <text x="560" y="166" font-size="30" font-weight="800" fill="${C.deep}">500 L buffalo</text>
-  <text x="560" y="194" font-size="16" fill="#6a6f5f">Hotel in Islamabad · farm fresh</text>
+  <text x="560" y="194" font-size="16" fill="#6a6f5f">Hotel in Islamabad, farm fresh</text>
   ${bids.map(([n, p], i) => { const a = seg(lt, 1.6 + i * 0.9, 2.1 + i * 0.9); const mine = i === 2; const won = mine && lt > 5.4
     return a > 0 ? g(`translate(${lerp(90, 0, spring(a))} 0)`, `<rect x="556" y="${226 + i * 92}" width="258" height="76" rx="18" fill="${won ? C.forest : C.malai}" stroke="${mine ? C.haldi : '#e6dbc2'}" stroke-width="${mine ? 4 : 2}"/>
       <text x="576" y="${258 + i * 92}" font-size="17" font-weight="700" fill="${won ? C.cream : C.ink}">${n}</text>
-      <text x="576" y="${284 + i * 92}" font-size="15" fill="${won ? C.haldi : '#6a6f5f'}">${won ? 'Bid won ✓' : 'Sealed bid'}</text>
+      <text x="576" y="${284 + i * 92}" font-size="15" fill="${won ? C.haldi : '#6a6f5f'}">${won ? 'Bid won ✓' : 'Open offer'}</text>
       <text x="796" y="${272 + i * 92}" text-anchor="end" font-size="22" font-weight="800" fill="${won ? C.haldi : C.deep}">${p}</text>`, `opacity="${a}"`) : '' }).join('')}
   ${lt > 5.4 ? g(`translate(690 585) rotate(-10) scale(${lerp(2.2, 1, spring(seg(lt, 5.4, 6.1)))})`, `<rect x="-78" y="-30" width="156" height="60" rx="10" fill="none" stroke="${C.haldi}" stroke-width="6"/><text x="0" y="14" text-anchor="middle" font-size="36" font-weight="800" fill="${C.haldi}">WON</text>`, `opacity="${seg(lt, 5.4, 5.7)}"`) : ''}
   <!-- home order card -->
   ${seg(lt, 6, 6.6) > 0 ? g(`translate(${lerp(1300, 1060, easeOut(seg(lt, 6, 6.8)))} 380)`, `
     <rect x="-150" y="-150" width="300" height="300" rx="30" fill="${C.malai}"/>
-    <text x="-120" y="-104" font-size="16" fill="#6a6f5f">Home order · app</text>
+    <text x="-120" y="-104" font-size="16" fill="#6a6f5f">Home order from the app</text>
     <text x="-120" y="-64" font-size="30" font-weight="800" fill="${C.deep}">2 L farm fresh</text>
-    <text x="-120" y="-34" font-size="17" fill="#6a6f5f">Ahmed family, G-11</text>
+    <text x="-120" y="-34" font-size="17" fill="#6a6f5f">Ahmed family, G 11</text>
     <rect x="-120" y="0" width="240" height="56" rx="28" fill="${C.haldi}"/><text x="0" y="36" text-anchor="middle" font-size="20" font-weight="800" fill="${C.deep}">Out for delivery</text>
     ${churn(80, 130, 0.6)}`) : ''}
   </g>
@@ -299,12 +300,33 @@ const scenes = [scene1, scene2, scene3, scene4, scene5, scene6, scene7, scene8]
 // [start zoom, end zoom, focus x, focus y] for each scene
 const CAMERA = [[1.0, 1.07, 820, 520], [1.02, 1.0, 700, 560], [1.0, 1.06, 760, 450], [1.0, 1.1, 960, 360], [1.0, 1.05, 640, 340], [1.04, 1.0, 640, 360], [1.0, 1.06, 960, 470], [1.06, 1.0, 640, 360]]
 
+// opening title: "Farm se ghar tak" over a dawn sky, before scene 1
+function intro(t) {
+  const a = easeOut(seg(t, 0.2, 1.2)), u = easeOut(seg(t, 0.8, 1.8)), l = easeOut(seg(t, 1.2, 2.2))
+  const words = ['Farm', 'se', 'ghar', 'tak']
+  return `
+  <defs><linearGradient id="introSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#173a28"/><stop offset="1" stop-color="#2a5a3f"/></linearGradient>
+  <pattern id="introFurrow" width="24" height="24" patternUnits="userSpaceOnUse" patternTransform="rotate(-28)"><rect width="2" height="24" fill="#ffffff" opacity=".05"/></pattern></defs>
+  <rect width="1280" height="720" fill="url(#introSky)"/><rect width="1280" height="720" fill="url(#introFurrow)"/>
+  ${sun(1010, lerp(600, 520, easeOut(seg(t, 0, 3.5))), 56, 0.9)}
+  <path d="M0 560 C220 520 420 525 640 545 S1040 520 1280 540 V720 H0 Z" fill="#cfe5d3" opacity=".22"/>
+  <path d="M0 610 C260 585 520 590 760 605 S1100 590 1280 600 V720 H0 Z" fill="#cfe5d3" opacity=".34"/>
+  <text x="640" y="330" text-anchor="middle" font-size="104" font-weight="800" fill="${C.cream}">${words.map((w, i) => {
+    const q = easeOut(seg(t, 0.25 + i * 0.16, 0.85 + i * 0.16))
+    return `<tspan fill="${i === 2 ? C.haldi : C.cream}" fill-opacity="${q}">${i ? ' ' : ''}${w}</tspan>`
+  }).join('')}</text>
+  <text x="640" y="${lerp(424, 412, u)}" text-anchor="middle" font-family="Nastaliq" font-size="44" fill="${C.haldi}" opacity="${u}">فارم سے گھر تک</text>
+  <text x="640" y="470" text-anchor="middle" font-size="22" fill="${C.cream}" opacity="${l * 0.75}">The journey of a litre of milk with ApnaDairy</text>`
+}
+
 function render(t) {
   setT(t)
   let out = ''
+  if (t < INTRO + 0.7) out += `<g opacity="${1 - seg(t, INTRO, INTRO + 0.7)}">${intro(t)}</g>`
+  t -= INTRO
   SCENES.forEach(([a, b], i) => {
     if (t >= a && t < b + 0.6) {
-      const alpha = i === 0 ? 1 : ease(seg(t, a, a + 0.6))
+      const alpha = ease(seg(t, a, a + 0.6))
       const [art, cap = ''] = scenes[i](t).split('<!--cap-->')
       const [z0, z1, fx, fy] = CAMERA[i]
       const z = lerp(z0, z1, ease(seg(t, a, b + 0.6)))
@@ -312,9 +334,10 @@ function render(t) {
     }
   })
   // fade from and to black at the very start and end
-  const black = Math.max(1 - seg(t, 0, 0.5), seg(t, DURATION - 0.8, DURATION))
-  out += `<rect width="1280" height="720" fill="#000" opacity="${black}"/>`
-  document.getElementById('stage').innerHTML = out
+  const black = Math.max(1 - seg(t + INTRO, 0, 0.5), seg(t + INTRO, DURATION - 0.8, DURATION))
+  // soft vignette for depth, then fade from/to black at the very start and end
+  out += `<rect width="1280" height="720" fill="url(#vig)"/><rect width="1280" height="720" fill="#000" opacity="${black}"/>`
+  document.getElementById('stage').innerHTML = `<defs><radialGradient id="vig" cx=".5" cy=".5" r=".75"><stop offset=".65" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".22"/></radialGradient></defs>` + out
 }
 window.render = render
 window.DURATION = DURATION

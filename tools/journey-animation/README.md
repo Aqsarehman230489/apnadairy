@@ -19,5 +19,5 @@ python sound.py
 python capture.py          # writes apnadairy-journey.mp4 (needs ffmpeg and chromium)
 ```
 
-Scenes: 1 farm at sunrise · 2 loader to the milk shop · 3 area manager's shop · 4 IoT test ·
+Opening title "Farm se ghar tak", then scenes: 1 farm at sunrise · 2 loader to the milk shop · 3 area manager's shop · 4 IoT test ·
 5 price and payment · 6 stock, listing and bids · 7 delivery to a family · 8 end card.

@@ -52,7 +52,7 @@ export default function HowItWorks() {
                   <button role="tab" aria-selected={on} onClick={() => pick(i)}
                     className={`relative w-full overflow-hidden rounded-2xl px-4 text-left transition-all duration-300 ${on ? 'bg-cream/10 py-4' : 'py-2.5 hover:bg-cream/5'}`}>
                     <span className="flex items-center gap-4">
-                      <span className={`display num grid h-10 w-10 shrink-0 place-items-center rounded-full text-[17px] transition-colors duration-300 ${on ? 'bg-gradient-to-br from-[#f6cf6a] to-[#d8952a] text-forest-deep' : 'bg-cream/10 text-cream/80'}`}>{i + 1}</span>
+                      <span className={`display num grid h-10 w-10 shrink-0 place-items-center rounded-full text-[17px] transition-colors duration-300 ${on ? 'bg-haldi text-forest-deep' : 'bg-cream/10 text-cream/80'}`}>{i + 1}</span>
                       <span className={`display text-[21px] transition-colors sm:text-[23px] ${on ? 'text-cream' : 'text-cream/60'}`}>{st.title}</span>
                     </span>
                     <span className={`grid transition-all duration-300 ${on ? 'mt-2 grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>

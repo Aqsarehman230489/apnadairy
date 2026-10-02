@@ -46,6 +46,7 @@ src/
     business/   BusinessHome, Requirements, NewRequirement, RequirementDetail, BusinessOrders
     PublicRequests.jsx   public board of open bulk requests (/requests)
 supabase/       numbered sql files, one per module
+tools/journey-animation/   source of the homepage film (svg scenes + synthesised sound)
 ```
 
 ## How auth works (for viva)

@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { useLoad } from '../lib/useLoad'
 import PublicHeader from '../components/landing/PublicHeader'
@@ -20,14 +21,22 @@ export default function Home() {
     if (error) return [] // homepage still renders if the board can't load
     return data
   })
+  // gentle snapping between full-screen sections, homepage only
+  useEffect(() => {
+    document.documentElement.classList.add('home-snap')
+    return () => document.documentElement.classList.remove('home-snap')
+  }, [])
   const live = requests && { count: requests.length, litres: requests.reduce((n, r) => n + Number(r.quantity_l), 0) }
 
   return (
     <div className="min-h-full bg-cream">
       <PublicHeader />
       <main>
-        <Hero live={live} />
-        <Marquee />
+        {/* first screen: photo hero + marquee */}
+        <div className="screen flex flex-col pb-0 lg:h-[calc(100svh-68px)]">
+          <Hero live={live} />
+          <Marquee />
+        </div>
         <ModuleDial />
         <Problem />
         <HowItWorks />

@@ -8,21 +8,21 @@ import { MilkChurn } from '../Farm'
 export default function LiveBoard({ requests }) {
   const list = (requests ?? []).slice(0, 3)
   return (
-    <section className="px-3 sm:px-6 lg:px-8">
-      <div className="furrows relative mx-auto max-w-[1600px] overflow-hidden rounded-[32px] bg-forest text-cream sm:rounded-[40px]">
-        <div className="mx-auto max-w-[1320px] px-6 py-20 sm:px-8 sm:py-24">
+    <section className="screen px-3 py-6 sm:px-6 lg:px-8">
+      <div className="furrows relative mx-auto flex w-full max-w-[1600px] flex-1 flex-col justify-center overflow-hidden rounded-[32px] bg-forest text-cream sm:rounded-[40px]">
+        <div className="mx-auto w-full max-w-[1320px] px-6 py-16 sm:px-8 lg:py-10">
           <Reveal className="flex flex-wrap items-end justify-between gap-6">
             <div>
               <p className="flex items-center gap-2 text-[14px] font-semibold text-haldi">
                 <span className="relative flex h-2.5 w-2.5"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-haldi opacity-70" /><span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-haldi" /></span>
                 Live from the bulk market
               </p>
-              <h2 className="display mt-3 max-w-2xl text-[44px] sm:text-[60px]">Bulk doodh, wanted today.</h2>
+              <h2 className="display mt-3 max-w-2xl text-[42px] sm:text-[clamp(42px,6.6vh,60px)]">Bulk doodh, wanted today.</h2>
             </div>
             <Link to="/requests" className="btn-haldi">See all requests</Link>
           </Reveal>
 
-          <div className="mt-12 grid gap-4 md:grid-cols-3">
+          <div className="mt-10 grid gap-4 md:grid-cols-3 lg:mt-[clamp(20px,5vh,56px)]">
             {list.length === 0 && (
               <div className="rounded-[24px] border border-cream/15 bg-cream/5 p-8 text-cream/75 md:col-span-3">
                 No open requests right now. Businesses post them once their account is verified.
@@ -40,7 +40,7 @@ export default function LiveBoard({ requests }) {
                   </p>
                   <p className="mt-5 flex items-center justify-between border-t border-line pt-4 text-[14px]">
                     <span className="font-semibold">Closes {relative(r.bid_deadline)}</span>
-                    <span className="num text-muted">{r.bid_count} {r.bid_count === 1 ? 'bid' : 'bids'}</span>
+                    <span className="num text-muted">{r.bid_count} {r.bid_count === 1 ? 'offer' : 'offers'}{r.lowest_offer ? `, from ${rs(r.lowest_offer)}` : ''}</span>
                   </p>
                 </article>
               </Reveal>

@@ -5,7 +5,7 @@ const items = [
   'Verified collection centers',
   'Every can tested at intake',
   'Farmers see the price before they sell',
-  'Sealed bids for bulk buyers',
+  'Open bids anyone can see',
   'Every batch traced to its farm',
   'Simulated sensor readings are always labelled',
 ]
@@ -22,7 +22,7 @@ export default function Marquee() {
     </div>
   )
   return (
-    <div className="marquee mt-6 overflow-hidden border-y border-line bg-mint-soft/70 py-5">
+    <div className="marquee mt-3 shrink-0 overflow-hidden border-y border-line bg-mint-soft/70 py-4">
       <div className="marquee-track flex w-max motion-reduce:animate-none">{row(false)}{row(true)}</div>
     </div>
   )

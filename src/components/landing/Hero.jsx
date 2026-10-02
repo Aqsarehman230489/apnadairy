@@ -13,12 +13,13 @@ const Line = ({ children, delay }) => (
   </span>
 )
 
+// fills the first screen together with the marquee below it
 export default function Hero({ live }) {
   const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
 
   return (
-    <section aria-label="ApnaDairy" className="px-3 pt-1 sm:px-6 lg:px-8">
-      <div className="relative mx-auto min-h-[calc(100svh-80px)] max-w-[1600px] overflow-hidden rounded-[28px] bg-forest-deep sm:min-h-[calc(100svh-92px)] sm:rounded-[40px]">
+    <section aria-label="ApnaDairy" className="flex min-h-[calc(100svh-150px)] flex-1 flex-col px-3 pt-1 sm:px-6 lg:min-h-0 lg:px-8">
+      <div className="relative mx-auto flex w-full max-w-[1600px] flex-1 overflow-hidden rounded-[28px] bg-forest-deep sm:rounded-[40px]">
         <picture className="hero-zoom absolute inset-0 block h-full w-full">
           <source media="(min-width: 768px)" type="image/avif" srcSet={`${desktopAvif1200} 1200w, ${desktopAvif} 1672w`} sizes="100vw" />
           <source media="(min-width: 768px)" type="image/webp" srcSet={`${desktopWebp1200} 1200w, ${desktopWebp} 1672w`} sizes="100vw" />
@@ -29,25 +30,25 @@ export default function Hero({ live }) {
         <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-[#0e2618]/95 via-[#173a28]/55 to-transparent" />
         <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-[#0e2618]/85 via-transparent to-[#0e2618]/25" />
 
-        <div className="relative z-10 flex min-h-[inherit] flex-col justify-end px-6 pb-8 pt-24 sm:p-12 lg:p-16">
+        <div className="relative z-10 flex w-full flex-col justify-end px-6 pb-8 pt-20 sm:p-10 lg:px-14 lg:py-[clamp(28px,5vh,56px)]">
           <div className="max-w-3xl">
             <p className="hero-fade text-[14px] font-semibold text-haldi" style={{ animationDelay: '.05s' }}>Pakistan's connected dairy network</p>
-            <h1 className="display mt-4 text-[52px] leading-[.95] text-cream sm:text-[84px] lg:text-[104px]">
+            <h1 className="display mt-3 text-[clamp(46px,min(8vw,9.4vh),104px)] leading-[.95] text-cream">
               <Line delay={0.15}>Fresh milk</Line>
               <Line delay={0.27}>should never</Line>
               <Line delay={0.39}>be a <span className="text-haldi">guess.</span></Line>
             </h1>
-            <p className="hero-fade mt-6 max-w-xl text-[17px] leading-relaxed text-cream/85 sm:text-[19px]" style={{ animationDelay: '.6s' }}>
+            <p className="hero-fade mt-5 max-w-xl text-[17px] leading-relaxed text-cream/85 sm:text-[18px]" style={{ animationDelay: '.6s' }}>
               Farmers bring milk to verified collection centers. Every can is tested, priced fairly and tracked,
               then sold fresh to homes and businesses.
             </p>
-            <div className="hero-fade mt-8 flex flex-wrap gap-3" style={{ animationDelay: '.72s' }}>
+            <div className="hero-fade mt-7 flex flex-wrap gap-3" style={{ animationDelay: '.72s' }}>
               <Link to="/signup" className="btn-haldi h-[52px] px-7 text-[16px]">Join ApnaDairy</Link>
               <button onClick={() => scrollTo('how')} className="btn-on-dark h-[52px] px-7 text-[16px]">See how it works</button>
             </div>
 
-            <Link to="/requests" className="hero-fade group mt-8 flex max-w-sm items-center gap-4 rounded-2xl border border-cream/20 bg-cream/10 p-4 pr-5 backdrop-blur-md transition-colors hover:border-cream/40 hover:bg-cream/15 sm:mt-10" style={{ animationDelay: '.86s' }}>
-              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-haldi text-[22px] font-bold text-forest-deep transition-transform group-hover:rotate-[-8deg]">
+            <Link to="/requests" className="hero-fade group mt-6 flex max-w-sm items-center gap-4 rounded-2xl border border-cream/20 bg-cream/10 p-4 pr-5 backdrop-blur-md transition-colors hover:border-cream/40 hover:bg-cream/15" style={{ animationDelay: '.86s' }}>
+              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-[#f6cf6a] to-[#d8952a] text-[22px] font-bold text-forest-deep transition-transform group-hover:rotate-[-8deg]">
                 {live ? live.count : '·'}
               </span>
               <span>
@@ -63,7 +64,7 @@ export default function Hero({ live }) {
           </div>
 
           <button onClick={() => scrollTo('journey')} aria-label="Watch the farm-to-home film"
-            className="hero-pop mt-8 flex h-24 w-24 flex-col items-center justify-center gap-1 rounded-full border border-cream/30 bg-cream/10 text-cream backdrop-blur-md transition-all hover:scale-105 hover:bg-cream/20 active:scale-95 sm:absolute sm:bottom-12 sm:right-12 sm:mt-0 sm:h-28 sm:w-28 lg:right-16"
+            className="hero-pop mt-8 flex h-24 w-24 flex-col items-center justify-center gap-1 rounded-full border border-cream/30 bg-cream/10 text-cream backdrop-blur-md transition-all hover:scale-105 hover:bg-cream/20 active:scale-95 sm:absolute sm:bottom-10 sm:right-10 sm:mt-0 sm:h-28 sm:w-28 lg:right-14"
             style={{ animationDelay: '1s' }}>
             <span className="animate-bounce text-[20px] motion-reduce:animate-none">↓</span>
             <span className="px-3 text-center text-[11px] font-semibold leading-tight">Watch the film</span>

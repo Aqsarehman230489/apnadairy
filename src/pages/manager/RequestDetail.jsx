@@ -9,6 +9,7 @@ import Badge from '../../components/Badge'
 import Alert from '../../components/Alert'
 import Loader from '../../components/Loader'
 import { MilkChurn } from '../../components/Farm'
+import OffersList from '../../components/OffersList'
 
 const freshPicks = [6, 12, 24, 48]
 
@@ -175,7 +176,11 @@ export default function RequestDetail() {
               <p className="mt-1 text-[15.5px]">“{req.notes}”</p>
             </div>
           )}
-          <p className="text-[13.5px] text-muted">The full address is shared only with the center whose bid is accepted. Other centers never see your price.</p>
+          <div className="panel p-5">
+            <p className="mb-3 font-semibold">Offers on this request</p>
+            <OffersList key={mine?.updated_at ?? 'none'} requirementId={req.id} target={req.target_price} highlight={mine?.status === 'submitted' ? mine.id : null} />
+          </div>
+          <p className="text-[13.5px] text-muted">Offers are public. The full delivery address is shared only with the center whose bid is accepted.</p>
         </section>
 
         <aside className="lg:sticky lg:top-10 lg:self-start">

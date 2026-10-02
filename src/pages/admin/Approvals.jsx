@@ -2,6 +2,10 @@ import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../../lib/supabase'
 import PageHeader from '../../components/PageHeader'
 import Alert from '../../components/Alert'
+import Badge from '../../components/Badge'
+import Segmented from '../../components/Segmented'
+import EmptyState from '../../components/EmptyState'
+import { date, cap } from '../../lib/format'
 import DocsDrawer from '../../components/DocsDrawer'
 import { hasRequiredDocs } from '../../lib/docs'
 
@@ -11,12 +15,6 @@ const tabs = [
 ]
 const statuses = ['pending', 'active', 'rejected', 'suspended']
 
-const badge = {
-  pending: 'bg-amber/15 text-amber',
-  active: 'bg-mint-soft text-forest',
-  rejected: 'bg-danger/10 text-danger',
-  suspended: 'bg-ink/10 text-ink',
-}
 
 export default function Approvals() {
   const [tab, setTab] = useState(tabs[0])
@@ -62,62 +60,49 @@ export default function Approvals() {
 
   return (
     <>
-      <PageHeader eyebrow="user management" title="Approvals" />
+      <PageHeader title="Approvals" description="Area managers and businesses can only use the portal after you check their details and documents." />
 
       <div className="mb-5 flex flex-wrap items-center gap-3">
-        <div className="flex rounded-xl bg-cream-2 p-1">
-          {tabs.map((t) => (
-            <button key={t.id} onClick={() => setTab(t)}
-              className={`rounded-lg px-4 py-2 text-sm ${tab.id === t.id ? 'bg-white font-semibold text-forest shadow-sm' : 'text-muted'}`}>
-              {t.label}
-            </button>
-          ))}
-        </div>
-        <div className="flex gap-1.5">
-          {statuses.map((s) => (
-            <button key={s} onClick={() => setStatus(s)}
-              className={`rounded-full border px-3 py-1.5 font-mono text-[11px] uppercase tracking-wider ${
-                status === s ? 'border-forest bg-forest text-cream' : 'border-line text-muted hover:bg-white'}`}>
-              {s}
-            </button>
-          ))}
-        </div>
+        <Segmented value={tab.id} onChange={(id) => setTab(tabs.find((t) => t.id === id))}
+          options={tabs.map((t) => ({ value: t.id, label: t.label }))} />
+        <Segmented value={status} onChange={setStatus} options={statuses.map((s) => ({ value: s, label: cap(s) }))} />
       </div>
 
       <Alert>{error}</Alert>
 
-      <div className="overflow-x-auto rounded-2xl border border-line bg-white/70">
-        <table className="w-full min-w-[760px] text-sm">
+      <div className="panel mt-3 overflow-x-auto">
+        <table className="table min-w-[860px]">
           <thead>
-            <tr className="border-b border-line text-left font-mono text-[11px] uppercase tracking-wider text-muted">
-              <th className="px-5 py-3 font-medium">{tab.id === 'area_manager' ? 'Center' : 'Business'}</th>
-              <th className="px-5 py-3 font-medium">Owner</th>
-              <th className="px-5 py-3 font-medium">City</th>
-              <th className="px-5 py-3 font-medium">Documents</th>
-              <th className="px-5 py-3 font-medium">Applied</th>
-              <th className="px-5 py-3 font-medium">Status</th>
-              <th className="px-5 py-3 font-medium text-right">Action</th>
+            <tr>
+              <th>{tab.id === 'area_manager' ? 'Center' : 'Business'}</th>
+              <th>Owner</th>
+              <th>City</th>
+              <th>Documents</th>
+              <th>Applied</th>
+              <th>Status</th>
+              <th className="text-right">Action</th>
             </tr>
           </thead>
           <tbody>
-            {loading && <tr><td colSpan={7} className="px-5 py-10 text-center text-muted">Loading…</td></tr>}
+            {loading && <tr><td colSpan={7} className="text-center text-muted">Loading…</td></tr>}
             {!loading && rows.length === 0 && (
-              <tr><td colSpan={7} className="px-5 py-10 text-center text-muted">No {status} applications.</td></tr>
+              <tr><td colSpan={7}><EmptyState title={`No ${status} applications`}>New sign-ups appear under Pending.</EmptyState></td></tr>
             )}
             {!loading && rows.map((r) => (
-              <tr key={r.id} className="border-b border-line/60 last:border-0">
-                <td className="px-5 py-4">
+              <tr key={r.id}>
+                <td>
                   <p className="font-semibold text-ink">{r.center_name ?? r.business_name}</p>
-                  <p className="font-mono text-[11px] text-muted">
-                    {tab.id === 'area_manager' ? (r.type === 'milk_center' ? 'milk collection center' : 'byproducts') : r.business_type}
+                  <p className="text-[13px] text-muted">
+                    {tab.id === 'area_manager' ? (r.type === 'milk_center' ? 'Milk collection center' : 'Dairy byproducts') : cap(r.business_type)}
                   </p>
                 </td>
-                <td className="px-5 py-4">
+                <td>
                   <p>{r.profile?.full_name}</p>
-                  <p className="font-mono text-[11px] text-muted">{r.profile?.email} · {r.profile?.phone}</p>
+                  <p className="text-[13px] text-muted">{r.profile?.email}</p>
+                  <p className="text-[13px] text-muted">{r.profile?.phone}</p>
                 </td>
-                <td className="px-5 py-4">{r.city}</td>
-                <td className="px-5 py-4">
+                <td>{r.city}</td>
+                <td>
                   {(() => {
                     const docs = docsByUser[r.user_id] ?? []
                     const ok = tab.id !== 'area_manager' || hasRequiredDocs(docs)
@@ -125,27 +110,25 @@ export default function Approvals() {
                       <button onClick={() => setViewing(r)} className="flex items-center gap-2 text-left hover:underline">
                         <span className={`h-2 w-2 rounded-full ${docs.length === 0 ? 'bg-danger' : ok ? 'bg-forest-2' : 'bg-amber'}`} />
                         <span className="text-xs">{docs.length} file{docs.length === 1 ? '' : 's'}</span>
-                        {!ok && <span className="font-mono text-[10px] uppercase text-amber">incomplete</span>}
+                        {!ok && <span className="text-xs text-amber">incomplete</span>}
                       </button>
                     )
                   })()}
                 </td>
-                <td className="px-5 py-4 font-mono text-xs text-muted">{new Date(r.created_at).toLocaleDateString()}</td>
-                <td className="px-5 py-4">
-                  <span className={`rounded-full px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider ${badge[r.verification_status]}`}>
-                    {r.verification_status}
-                  </span>
+                <td className="num text-muted">{date(r.created_at)}</td>
+                <td>
+                  <Badge status={r.verification_status} />
                 </td>
-                <td className="px-5 py-4">
+                <td>
                   <div className="flex justify-end gap-2">
                     {r.verification_status !== 'active' && (
-                      <button onClick={() => act(r.id, 'active')} className="rounded-lg bg-forest px-3 py-1.5 text-xs font-semibold text-cream hover:bg-forest-2">Approve</button>
+                      <button onClick={() => act(r.id, 'active')} className="btn-primary btn-sm">Approve</button>
                     )}
                     {r.verification_status === 'pending' && (
-                      <button onClick={() => act(r.id, 'rejected')} className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-danger hover:bg-danger/5">Reject</button>
+                      <button onClick={() => act(r.id, 'rejected')} className="btn-danger btn-sm">Reject</button>
                     )}
                     {r.verification_status === 'active' && (
-                      <button onClick={() => act(r.id, 'suspended')} className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold hover:bg-cream-2">Suspend</button>
+                      <button onClick={() => act(r.id, 'suspended')} className="btn-secondary btn-sm">Suspend</button>
                     )}
                   </div>
                 </td>

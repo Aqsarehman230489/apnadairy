@@ -42,8 +42,9 @@ src/
   pages/
     auth/       Login, Signup, Pending, MobileOnly
     admin/      AdminHome, Approvals
-    manager/    ManagerHome
-    business/   BusinessHome
+    manager/    ManagerHome, BulkRequests, RequestDetail, BulkOrders
+    business/   BusinessHome, Requirements, NewRequirement, RequirementDetail, BusinessOrders
+    PublicRequests.jsx   public board of open bulk requests (/requests)
 supabase/       numbered sql files, one per module
 ```
 
@@ -53,6 +54,17 @@ supabase/       numbered sql files, one per module
 - Area managers & businesses start **pending**; only an admin can change status via the `set_verification` RPC (security definer, checks `is_admin()`).
 - **RLS**: users read only their own rows; admin reads all. Users cannot change their own role/status (column-level grants).
 - Frontend `ProtectedRoute` checks session → active status → allowed role, and redirects otherwise.
+
+## How B2B bidding works (for viva)
+
+1. A **verified business** posts a bulk requirement: quantity, milk type, date, city, quality, optional fat minimum and target price, and a bidding deadline.
+2. It appears on the **public board** (`/requests`, no buyer name or address) and on the **bulk request board** for verified milk collection centers.
+3. Each center sends one **sealed bid** (price/L, litres, delivery date, fat %, max milk age). Centers never see each other's bids; they can update or withdraw until the deadline.
+4. The buyer sees every bid on a **price ladder** against their target. The system ranks the **best three qualifying bids** (full quantity, on time, meets fat minimum) cheapest first; others are listed with the reason they fall short.
+5. Accepting a bid (`accept_bid`) is one database transaction: the bid becomes *accepted*, the rest *not selected*, the requirement *awarded*, and a **bulk order** is created.
+6. The center moves the order *confirmed → dispatched → delivered*; either side can cancel while it is still confirmed.
+
+All writes go through security-definer functions that re-check who is calling, so the rules hold even if someone calls the API directly.
 
 ## Adding a new module
 

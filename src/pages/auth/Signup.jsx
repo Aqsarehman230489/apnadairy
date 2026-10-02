@@ -55,7 +55,7 @@ export default function Signup() {
         <Alert type="success">
           After confirming, sign in. Your account will be reviewed by the ApnaDairy admin before you get full access.
         </Alert>
-        <Link to="/login" className="btn-primary mt-6 grid place-items-center">Go to sign in</Link>
+        <Link to="/login" className="btn-primary mt-6 w-full">Go to sign in</Link>
       </AuthShell>
     )
   }
@@ -63,12 +63,13 @@ export default function Signup() {
   return (
     <AuthShell title="Create your account" subtitle="Accounts are verified by ApnaDairy before activation.">
       {/* role picker */}
-      <div className="grid grid-cols-2 gap-2 rounded-xl bg-cream-2 p-1.5 mb-6">
+      <div className="mb-6 grid grid-cols-2 gap-2" role="radiogroup" aria-label="Account type">
         {roles.map((r) => (
           <button key={r.id} type="button" onClick={() => setRole(r.id)}
-            className={`rounded-lg px-3 py-2.5 text-left transition ${role === r.id ? 'bg-white shadow-sm' : 'hover:bg-white/50'}`}>
-            <p className={`text-sm font-semibold ${role === r.id ? 'text-forest' : 'text-ink'}`}>{r.label}</p>
-            <p className="text-[11px] leading-snug text-muted mt-0.5">{r.hint}</p>
+            role="radio" aria-checked={role === r.id}
+            className={`rounded-[10px] border px-3.5 py-3 text-left transition-colors ${role === r.id ? 'border-forest bg-mint-soft' : 'border-line bg-surface hover:border-[#b9c4c9]'}`}>
+            <p className={`text-[15px] font-semibold ${role === r.id ? 'text-forest' : 'text-ink'}`}>{r.label}</p>
+            <p className="mt-0.5 text-[13px] leading-snug text-muted">{r.hint}</p>
           </button>
         ))}
       </div>

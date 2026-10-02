@@ -1,0 +1,109 @@
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { supabase } from '../../lib/supabase'
+import { useAuth } from '../../context/AuthContext'
+import { requestBoard, myBids, milkLabel, qualityLabel } from '../../lib/b2b'
+import { useLoad } from '../../lib/useLoad'
+import { rs, litres, date, relative, cap } from '../../lib/format'
+import PageHeader from '../../components/PageHeader'
+import Segmented from '../../components/Segmented'
+import Badge from '../../components/Badge'
+import Alert from '../../components/Alert'
+import EmptyState from '../../components/EmptyState'
+
+export default function BulkRequests() {
+  const { profile } = useAuth()
+  const nav = useNavigate()
+  const [tab, setTab] = useState('board')
+
+  const { data, error, loading } = useLoad(async () => {
+    const { data: center } = await supabase.from('area_managers').select('type').eq('user_id', profile.id).single()
+    if (center?.type !== 'milk_center') return { byproduct: true }
+    const [board, bids] = await Promise.all([requestBoard(), myBids()])
+    return { board, bids }
+  }, [profile.id])
+
+  if (data?.byproduct) {
+    return (
+      <>
+        <PageHeader title="Bulk requests" />
+        <div className="panel"><EmptyState title="Bulk milk bidding is for milk collection centers">Your account is registered for dairy byproducts, so you can't bid on bulk milk requests.</EmptyState></div>
+      </>
+    )
+  }
+
+  const bidFor = Object.fromEntries((data?.bids ?? []).map((b) => [b.requirement?.id, b]))
+  const liveBids = (data?.bids ?? []).filter((b) => b.status === 'submitted').length
+
+  return (
+    <>
+      <PageHeader title="Bulk requests" description="Restaurants, hotels and other verified businesses looking for milk in bulk. Your bid is sealed: only the buyer sees it." />
+
+      <div className="mb-4">
+        <Segmented value={tab} onChange={setTab} options={[
+          { value: 'board', label: 'Open requests', count: data?.board?.length },
+          { value: 'mine', label: 'My bids', count: data ? liveBids : null },
+        ]} />
+      </div>
+      <Alert>{error}</Alert>
+
+      {tab === 'board' ? (
+        <div className="panel overflow-x-auto">
+          <table className="table min-w-[900px]">
+            <thead>
+              <tr><th>Buyer</th><th>Needs</th><th>Delivery</th><th className="text-right">Target / L</th><th className="text-right">Bids</th><th>Closes</th><th>Your bid</th></tr>
+            </thead>
+            <tbody>
+              {loading && <tr><td colSpan={7} className="text-center text-muted">Loading…</td></tr>}
+              {!loading && data?.board?.length === 0 && (
+                <tr><td colSpan={7}><EmptyState title="No open requests right now">New requests from businesses appear here as soon as they're posted.</EmptyState></td></tr>
+              )}
+              {data?.board?.map((r) => {
+                const mine = bidFor[r.id]
+                return (
+                  <tr key={r.id} className="clickable" onClick={() => nav(`/manager/bulk-requests/${r.id}`)}>
+                    <td><p className="font-semibold">{r.business_name}</p><p className="text-[13px] text-muted">{cap(r.business_type)}</p></td>
+                    <td>
+                      <Link to={`/manager/bulk-requests/${r.id}`} onClick={(e) => e.stopPropagation()} className="num font-semibold hover:underline">
+                        {litres(r.quantity_l)} {milkLabel[r.milk_type].toLowerCase()}
+                      </Link>
+                      <p className="text-[13px] text-muted">{qualityLabel[r.quality]} quality{r.min_fat ? `, fat ${r.min_fat}%+` : ''}</p>
+                    </td>
+                    <td className="num">{date(r.required_date)}<p className="text-[13px] text-muted">{r.delivery_city}</p></td>
+                    <td className="num text-right">{r.target_price ? rs(r.target_price) : <span className="text-muted">Open</span>}</td>
+                    <td className="num text-right">{r.bid_count}</td>
+                    <td className="text-muted">{relative(r.bid_deadline)}</td>
+                    <td>{mine && mine.status === 'submitted' ? <span className="num text-[13px] font-semibold text-forest">{rs(mine.price_per_l)}</span> : <span className="text-[13px] text-muted">Not bid</span>}</td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="panel overflow-x-auto">
+          <table className="table min-w-[820px]">
+            <thead><tr><th>Request</th><th className="text-right">Your price / L</th><th className="text-right">Your quantity</th><th>You deliver</th><th>Status</th></tr></thead>
+            <tbody>
+              {data?.bids?.length === 0 && (
+                <tr><td colSpan={5}><EmptyState title="You haven't bid yet">Open a request from the board to send your price.</EmptyState></td></tr>
+              )}
+              {data?.bids?.map((b) => (
+                <tr key={b.id} className="clickable" onClick={() => b.requirement && nav(`/manager/bulk-requests/${b.requirement.id}`)}>
+                  <td>
+                    <p className="num font-semibold">{b.requirement ? `${litres(b.requirement.quantity_l)} ${milkLabel[b.requirement.milk_type].toLowerCase()}` : 'Request removed'}</p>
+                    <p className="text-[13px] text-muted">{b.requirement?.delivery_city}{b.requirement?.target_price ? `, target ${rs(b.requirement.target_price)}` : ''}</p>
+                  </td>
+                  <td className="num text-right font-semibold">{rs(b.price_per_l)}</td>
+                  <td className="num text-right">{litres(b.quantity_l)}</td>
+                  <td className="num">{date(b.delivery_date)}</td>
+                  <td><Badge status={b.status}>{b.status === 'submitted' ? 'Waiting for buyer' : b.status === 'accepted' ? 'Won' : undefined}</Badge></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </>
+  )
+}

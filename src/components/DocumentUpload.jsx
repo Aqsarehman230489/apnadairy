@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { docLabel, docPlan, listDocs, uploadDoc, removeDoc, openDoc, hasRequiredDocs } from '../lib/docs'
 import Alert from './Alert'
+import Badge from './Badge'
 
 export default function DocumentUpload({ profile }) {
   const plan = docPlan[profile.role] ?? []
@@ -32,19 +33,16 @@ export default function DocumentUpload({ profile }) {
   const complete = profile.role !== 'area_manager' || hasRequiredDocs(docs)
 
   return (
-    <div className="rounded-xl border border-line bg-white/60 p-5">
+    <div className="panel p-5">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-sm font-semibold text-forest">Verification documents</p>
-        <span className={`rounded-full px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider ${
-          complete ? 'bg-mint-soft text-forest' : 'bg-amber/15 text-amber'}`}>
-          {complete ? 'ready for review' : 'documents needed'}
-        </span>
+        <p className="font-semibold text-ink">Verification documents</p>
+        <Badge tone={complete ? 'green' : 'amber'}>{complete ? 'Ready for review' : 'Documents needed'}</Badge>
       </div>
       <p className="mt-1 text-xs text-muted">
         {profile.role === 'area_manager'
           ? 'Required: CNIC front + at least one proof of your center (registration, utility bill, shop photo or bank statement).'
           : 'Recommended: upload registration or NTN so we can verify your business faster.'}
-        {' '}JPG, PNG or PDF · max 5 MB.
+        {' '}JPG, PNG or PDF, up to 5 MB each.
       </p>
 
       <div className="mt-3"><Alert>{error}</Alert></div>
@@ -57,10 +55,10 @@ export default function DocumentUpload({ profile }) {
               <div className="flex items-center justify-between gap-3">
                 <p className="text-sm">
                   {docLabel[slot.type]}
-                  {slot.required && <span className="ml-1.5 font-mono text-[10px] uppercase text-danger">required</span>}
-                  {slot.group && <span className="ml-1.5 font-mono text-[10px] uppercase text-muted">proof</span>}
+                  {slot.required && <span className="ml-1.5 text-xs text-danger">required</span>}
+                  {slot.group && <span className="ml-1.5 text-xs text-muted">proof of premises</span>}
                 </p>
-                <label className={`cursor-pointer rounded-lg border border-line px-3 py-1.5 text-xs font-semibold hover:bg-cream-2 ${busy === slot.type ? 'opacity-50 pointer-events-none' : ''}`}>
+                <label className={`btn-secondary btn-sm cursor-pointer ${busy === slot.type ? 'opacity-50 pointer-events-none' : ''}`}>
                   {busy === slot.type ? 'Uploading…' : mine.length ? 'Add another' : 'Upload'}
                   <input type="file" accept="image/jpeg,image/png,image/webp,application/pdf" className="hidden"
                     onChange={(e) => onPick(slot.type, e)} />
@@ -69,7 +67,7 @@ export default function DocumentUpload({ profile }) {
               {mine.map((d) => (
                 <div key={d.id} className="mt-2 flex items-center gap-3 rounded-lg bg-cream-2 px-3 py-2">
                   <span className="h-1.5 w-1.5 rounded-full bg-forest-2" />
-                  <button onClick={() => openDoc(d)} className="flex-1 truncate text-left font-mono text-[11px] text-forest hover:underline">
+                  <button onClick={() => openDoc(d)} className="flex-1 truncate text-left text-[13px] text-forest hover:underline">
                     {d.file_name}
                   </button>
                   <button onClick={() => onRemove(d)} disabled={busy === d.id} className="text-[11px] text-danger hover:underline">

@@ -132,3 +132,102 @@ html { scroll-behavior: smooth; scroll-padding-top: 68px; }
 .step-progress { transform-origin: left; animation: step-progress var(--dur, 5s) linear both; }
 @keyframes dial-spin { to { transform: rotate(360deg); } }
 .dial-spin { transform-origin: 50px 50px; animation: dial-spin 60s linear infinite; }
+
+/* ---------- header "Join ApnaDairy" button ---------- */
+@property --angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+
+.join-cta {
+  --x: 50%; --y: 50%;
+  position: relative; isolation: isolate; overflow: hidden;
+  display: inline-flex; align-items: center; gap: 12px;
+  height: 44px; padding: 0 6px 0 20px; border-radius: 999px;
+  background: #173a28; color: #f7f1e3;
+  font-size: 14.5px; font-weight: 600; letter-spacing: .01em; white-space: nowrap;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .12), 0 10px 24px -12px rgb(23 58 40 / .75);
+  transition: transform .2s ease, box-shadow .3s ease;
+}
+
+/* a thin light that travels around the border */
+/* a bright light that travels around the border, with a soft glow trailing it */
+.join-cta::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; padding: 2.5px;
+  background: conic-gradient(from var(--angle),
+    rgb(226 169 59 / .25) 0%,          /* faint gold all the way round, so the edge is always visible */
+    rgb(226 169 59 / .25) 55%,
+    #e2a93b 70%,
+    #fff3cc 78%,                        /* bright tip of the light */
+    #e2a93b 84%,
+    rgb(226 169 59 / .25) 95%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: join-orbit 2.6s linear infinite;
+}
+@keyframes join-orbit { to { --angle: 360deg; } }
+@keyframes join-orbit { to { --angle: 360deg; } }
+
+/* warm spotlight that follows the cursor */
+.join-cta::after {
+  content: ''; position: absolute; inset: 0; z-index: -2; border-radius: inherit;
+  background: radial-gradient(110px circle at var(--x) var(--y), rgb(226 169 59 / .38), transparent 65%);
+  opacity: 0; transition: opacity .3s ease;
+}
+.join-cta:hover::after { opacity: 1; }
+.join-cta:hover { transform: translateY(-1px); box-shadow: inset 0 1px 0 rgb(255 255 255 / .16), 0 16px 30px -14px rgb(23 58 40 / .85); }
+.join-cta:active { transform: translateY(0) scale(.97); }
+
+/* yellow circle with an arrow that swaps on hover */
+.join-cta-arrow {
+  position: relative; overflow: hidden; display: grid; place-items: center;
+  width: 32px; height: 32px; border-radius: 999px;
+  background: #e2a93b; color: #173a28;
+  transition: transform .3s ease;
+}
+.join-cta-arrow svg { position: absolute; transition: transform .35s cubic-bezier(.6,0,.2,1); }
+.join-cta-arrow .a2 { transform: translateX(-180%); }
+.join-cta:hover .join-cta-arrow .a1 { transform: translateX(180%); }
+.join-cta:hover .join-cta-arrow .a2 { transform: translateX(0); }
+.join-cta:hover .join-cta-arrow { transform: scale(1.06); }
+
+@media (prefers-reduced-motion: reduce) {
+  .join-cta::before { animation: none; }
+  .join-cta-arrow svg { transition: none; }
+}
+
+/* hero "Watch the film" card */
+.film-cta {
+  display: flex; align-items: center; gap: 14px;
+  padding: 8px 20px 8px 8px; border-radius: 22px;
+  background: rgb(247 241 227 / .1);
+  border: 1px solid rgb(247 241 227 / .22);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .12), 0 18px 40px -20px rgb(0 0 0 / .6);
+  transition: background .3s ease, border-color .3s ease, transform .2s ease;
+}
+.film-cta:hover { background: rgb(247 241 227 / .16); border-color: rgb(247 241 227 / .4); transform: translateY(-2px); }
+.film-cta:active { transform: scale(.98); }
+
+/* a small live preview of the film */
+.film-cta-thumb {
+  position: relative; display: block; width: 104px; aspect-ratio: 16 / 10;
+  border-radius: 14px; overflow: hidden; flex-shrink: 0;
+}
+.film-cta-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+.film-cta:hover .film-cta-thumb img { transform: scale(1.08); }
+.film-cta-thumb::after { content: ''; position: absolute; inset: 0; background: rgb(23 58 40 / .25); transition: background .3s ease; }
+.film-cta:hover .film-cta-thumb::after { background: rgb(23 58 40 / .1); }
+
+/* play button with a soft pulse */
+.film-cta-play {
+  position: absolute; left: 50%; top: 50%; z-index: 1; translate: -50% -50%;
+  display: grid; place-items: center; width: 34px; height: 34px; border-radius: 999px;
+  background: rgb(247 241 227 / .92); color: #173a28; padding-left: 2px;
+  transition: background .25s ease, transform .25s ease;
+}
+.film-cta-play::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit;
+  border: 2px solid rgb(247 241 227 / .8);
+  animation: film-pulse 2.2s ease-out infinite;
+}
+.film-cta:hover .film-cta-play { background: #e2a93b; transform: scale(1.1); }
+@keyframes film-pulse { from { transform: scale(1); opacity: .9; } to { transform: scale(1.8); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .film-cta-play::before { animation: none; } }

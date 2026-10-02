@@ -2,9 +2,10 @@ import { useRef, useState } from 'react'
 import Reveal from './Reveal'
 
 // the illustrated farm-to-home film (source in tools/journey-animation)
-// sized from the screen height: heading (~120px) + frame padding and controls (~80px)
-// + breathing room leave the rest of the screen for the 16:9 film
-const FRAME = 'max-w-[min(1180px,calc((100svh-68px-262px)*16/9+24px))]'
+// on laptops and desktops the section is one screen: a single heading row on top,
+// and the 16:9 film takes all the remaining height (width follows from the height,
+// and never exceeds the page width), with even padding around it.
+const FILM_W = 'lg:w-[min(100%,calc((100svh-68px-150px)*16/9))]'
 
 export default function Journey() {
   const video = useRef(null)
@@ -27,29 +28,30 @@ export default function Journey() {
 
   return (
     <section id="journey" className="screen px-4 py-20 sm:px-8 lg:py-6">
-      <Reveal className={`mx-auto w-full text-center ${FRAME}`}>
-        <h2 className="display text-[38px] text-forest-deep sm:text-[clamp(38px,5.6vh,52px)]">Farm se ghar tak</h2>
-        <p className="mx-auto mt-2 max-w-[540px] text-[16.5px] text-muted">
-          One minute with the milk: from a farm at sunrise to the area manager's shop, a fair price, and a family's door.
-        </p>
-      </Reveal>
+      <div className={`mx-auto w-full ${FILM_W}`}>
+        <Reveal className="flex flex-wrap items-end justify-between gap-x-8 gap-y-2">
+          <h2 className="display text-[38px] leading-none text-forest-deep sm:text-[48px]">Farm se ghar tak</h2>
+          <p className="max-w-[460px] text-[16px] text-muted lg:text-right">
+            One minute with the milk: from a farm at sunrise to the area manager's shop, a fair price, and a family's door.
+          </p>
+        </Reveal>
 
-      <Reveal delay={0.1}>
-        <figure className={`mx-auto mt-6 w-full rounded-[32px] border border-line bg-surface p-3 shadow-[0_40px_80px_-50px_rgb(23_58_40/.7)] ${FRAME}`}>
-          <video ref={video} className="aspect-video w-full rounded-[22px] bg-forest-deep object-cover" src="/media/apnadairy-journey.mp4" poster="/media/apnadairy-journey-poster.jpg"
-            autoPlay muted loop playsInline preload="metadata"
-            aria-label="Animated film: milk travels from a Pakistani farm to the area manager's milk shop, is tested and priced, then delivered to a family" />
-          <figcaption className="flex flex-wrap items-center justify-between gap-3 px-2 pb-1 pt-3">
-            <span className="text-[14px] text-muted">{muted ? 'Playing without sound' : 'Sound on'}</span>
-            <span className="flex gap-2">
-              <button onClick={toggleSound} className={`btn-sm ${muted ? 'btn-haldi' : 'btn-secondary'}`}>
-                {muted ? 'Turn sound on' : 'Mute'}
+        <Reveal delay={0.1}>
+          <figure className="relative mt-5 overflow-hidden rounded-[28px] bg-forest-deep shadow-[0_30px_70px_-45px_rgb(23_58_40/.7)]">
+            <video ref={video} className="aspect-video w-full object-cover" src="/media/apnadairy-journey.mp4" poster="/media/apnadairy-journey-poster.jpg"
+              autoPlay muted loop playsInline preload="metadata"
+              aria-label="Animated film: milk travels from a Pakistani farm to the area manager's milk shop, is tested and priced, then delivered to a family" />
+            <div className="absolute bottom-4 right-4 flex gap-2">
+              <button onClick={toggleSound} className="rounded-full bg-cream/90 px-4 py-2 text-[14px] font-semibold text-forest-deep backdrop-blur transition-colors hover:bg-cream">
+                {muted ? 'Sound on' : 'Mute'}
               </button>
-              <button onClick={togglePlay} className="btn-secondary btn-sm">{playing ? 'Pause' : 'Play'}</button>
-            </span>
-          </figcaption>
-        </figure>
-      </Reveal>
+              <button onClick={togglePlay} className="rounded-full bg-cream/90 px-4 py-2 text-[14px] font-semibold text-forest-deep backdrop-blur transition-colors hover:bg-cream">
+                {playing ? 'Pause' : 'Play'}
+              </button>
+            </div>
+          </figure>
+        </Reveal>
+      </div>
     </section>
   )
 }

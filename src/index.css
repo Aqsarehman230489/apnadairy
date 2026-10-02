@@ -69,12 +69,8 @@ textarea.input { height: auto; padding: 10px 14px; resize: vertical; }
   font: inherit; font-size: 14.5px; font-weight: 600; cursor: pointer; white-space: nowrap;
   transition: background .15s, border-color .15s, transform .08s, box-shadow .15s;
 }
-.btn-primary {
-  position: relative; overflow: hidden; isolation: isolate; color: #fff; border: 1.5px solid #1b452f;
-  background: linear-gradient(135deg, #2f7a55 0%, #1f4d36 55%, #163826 100%);
-  box-shadow: 0 1px 0 rgb(255 255 255 / .22) inset, 0 8px 20px -8px rgb(23 58 40 / .75);
-}
-.btn-primary:hover { box-shadow: 0 1px 0 rgb(255 255 255 / .25) inset, 0 12px 26px -8px rgb(23 58 40 / .85), 0 0 0 4px rgb(207 229 211 / .55); transform: translateY(-1px); }
+.btn-primary { background: var(--color-forest); color: #fff; border: 1.5px solid var(--color-forest); box-shadow: 0 1px 0 rgb(255 255 255 / .15) inset, 0 4px 12px -6px rgb(23 58 40 / .6); }
+.btn-primary:hover { background: var(--color-forest-2); }
 .btn-secondary { background: #fff; color: var(--color-ink); border: 1.5px solid var(--color-line); }
 .btn-secondary:hover { border-color: var(--color-forest); color: var(--color-forest); }
 .btn-danger { background: #fff; color: var(--color-danger); border: 1.5px solid var(--color-line); }
@@ -82,19 +78,8 @@ textarea.input { height: auto; padding: 10px 14px; resize: vertical; }
 .btn-ghost { background: transparent; color: var(--color-ink); border: 0; padding: 0 12px; }
 .btn-ghost:hover { background: var(--color-cream-2); }
 .btn-primary:active, .btn-secondary:active, .btn-danger:active, .btn-ghost:active { transform: scale(.97); }
-.btn-haldi {
-  position: relative; overflow: hidden; isolation: isolate; color: var(--color-forest-deep); border: 1.5px solid #d99a24;
-  background: linear-gradient(135deg, #f6cf6a 0%, #e8b040 50%, #d8952a 100%);
-  box-shadow: 0 1px 0 rgb(255 255 255 / .5) inset, 0 8px 22px -8px rgb(216 149 42 / .8);
-}
-.btn-haldi:hover { box-shadow: 0 1px 0 rgb(255 255 255 / .55) inset, 0 12px 28px -8px rgb(216 149 42 / .9), 0 0 0 4px rgb(248 231 191 / .7); transform: translateY(-1px); }
-/* a light sweep across the main buttons on hover */
-.btn-primary::after, .btn-haldi::after {
-  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
-  background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / .35) 50%, transparent 70%);
-  transform: translateX(-120%); transition: transform .6s ease;
-}
-.btn-primary:hover::after, .btn-haldi:hover::after { transform: translateX(120%); }
+.btn-haldi { background: var(--color-haldi); color: var(--color-forest-deep); border: 1.5px solid var(--color-haldi); }
+.btn-haldi:hover { background: #ebb94f; }
 .btn-on-dark { background: transparent; color: var(--color-cream); border: 1.5px solid rgb(247 241 227 / .35); }
 .btn-on-dark:hover { background: rgb(247 241 227 / .1); border-color: rgb(247 241 227 / .6); }
 .btn-haldi, .btn-on-dark {

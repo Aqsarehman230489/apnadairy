@@ -48,7 +48,7 @@ export default function Hero({ live }) {
             </div>
 
             <Link to="/requests" className="hero-fade group mt-6 flex max-w-sm items-center gap-4 rounded-2xl border border-cream/20 bg-cream/10 p-4 pr-5 backdrop-blur-md transition-colors hover:border-cream/40 hover:bg-cream/15" style={{ animationDelay: '.86s' }}>
-              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-[#f6cf6a] to-[#d8952a] text-[22px] font-bold text-forest-deep transition-transform group-hover:rotate-[-8deg]">
+              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-haldi text-[22px] font-bold text-forest-deep transition-transform group-hover:rotate-[-8deg]">
                 {live ? live.count : '·'}
               </span>
               <span>

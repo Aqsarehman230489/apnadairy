@@ -7,7 +7,7 @@ export default function AuthShell({ title, subtitle, children }) {
     <div className="grid min-h-full lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
       <aside className="furrows relative hidden flex-col overflow-hidden bg-forest-deep text-cream lg:flex">
         <div className="relative z-10 p-12">
-          <Logo light />
+          <Link to="/" aria-label="ApnaDairy home"><Logo light /></Link>
           <h2 className="display mt-16 max-w-[520px] text-[52px] xl:text-[60px]">
             Khalis doodh, from the farm gate to your door.
           </h2>
@@ -22,7 +22,7 @@ export default function AuthShell({ title, subtitle, children }) {
       </aside>
 
       <main className="flex flex-col px-6 py-10 sm:px-12">
-        <div className="mb-10 lg:hidden"><Logo /></div>
+        <Link to="/" className="mb-10 lg:hidden" aria-label="ApnaDairy home"><Logo /></Link>
         <div className="m-auto w-full max-w-[440px] animate-rise">
           <h1 className="display text-[40px] text-forest-deep">{title}</h1>
           {subtitle && <p className="mt-2 text-[16px] text-muted">{subtitle}</p>}

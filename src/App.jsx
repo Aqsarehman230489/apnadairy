@@ -1,9 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { AuthProvider, useAuth } from './context/AuthContext'
+import { AuthProvider } from './context/AuthContext'
 import { UiProvider } from './context/UiContext'
-import { homeFor } from './lib/roles'
 import ProtectedRoute from './components/ProtectedRoute'
-import Loader from './components/Loader'
 import ModuleSoon from './components/ModuleSoon'
 import DashboardLayout from './layouts/DashboardLayout'
 
@@ -23,17 +21,10 @@ import NewRequirement from './pages/business/NewRequirement'
 import RequirementDetail from './pages/business/RequirementDetail'
 import BusinessOrders from './pages/business/BusinessOrders'
 import PublicRequests from './pages/PublicRequests'
+import Home from './pages/Home'
 import ManagerHome from './pages/manager/ManagerHome'
 import BusinessHome from './pages/business/BusinessHome'
 
-// "/" → signed-in users go to their portal, visitors to the public request board (landing page comes later)
-function Root() {
-  const { session, profile, loading } = useAuth()
-  if (loading) return <Loader />
-  if (!session) return <Navigate to="/requests" replace />
-  if (!profile) return <Loader label="Setting up your account" />
-  return <Navigate to={profile.status === 'active' ? homeFor(profile.role) : '/pending'} replace />
-}
 
 export default function App() {
   return (
@@ -41,7 +32,7 @@ export default function App() {
       <UiProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Root />} />
+          <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/pending" element={<Pending />} />

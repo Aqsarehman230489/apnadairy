@@ -62,11 +62,11 @@ export default function Hero({ live }) {
             </Link>
           </div>
 
-          <button onClick={() => scrollTo('journey')} aria-label="Watch the journey"
+          <button onClick={() => scrollTo('journey')} aria-label="Watch the farm-to-home film"
             className="hero-pop mt-8 flex h-24 w-24 flex-col items-center justify-center gap-1 rounded-full border border-cream/30 bg-cream/10 text-cream backdrop-blur-md transition-all hover:scale-105 hover:bg-cream/20 active:scale-95 sm:absolute sm:bottom-12 sm:right-12 sm:mt-0 sm:h-28 sm:w-28 lg:right-16"
             style={{ animationDelay: '1s' }}>
             <span className="animate-bounce text-[20px] motion-reduce:animate-none">↓</span>
-            <span className="px-3 text-center text-[11px] font-semibold leading-tight">Watch the journey</span>
+            <span className="px-3 text-center text-[11px] font-semibold leading-tight">Watch the film</span>
           </button>
         </div>
       </div>

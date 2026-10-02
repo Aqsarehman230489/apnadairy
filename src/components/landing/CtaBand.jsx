@@ -4,7 +4,7 @@ import { FarmScene } from '../Farm'
 
 export default function CtaBand() {
   return (
-    <section className="px-3 pb-6 sm:px-6 lg:px-8">
+    <section className="px-3 pb-6 pt-6 sm:px-6 lg:px-8">
       <div className="relative mx-auto max-w-[1600px] overflow-hidden rounded-[32px] bg-haldi sm:rounded-[40px]">
         <div className="mx-auto grid max-w-[1320px] items-center gap-8 px-6 py-16 sm:px-8 lg:grid-cols-[1.2fr_1fr] lg:py-20">
           <Reveal>

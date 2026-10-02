@@ -11,6 +11,7 @@ import Footer from '../components/landing/Footer'
 import Segmented from '../components/Segmented'
 import Alert from '../components/Alert'
 import { MilkChurn } from '../components/Farm'
+import OffersList from '../components/OffersList'
 
 const sorts = {
   closing: { label: 'Closing soon', fn: (a, b) => new Date(a.bid_deadline) - new Date(b.bid_deadline) },
@@ -56,15 +57,16 @@ function RequestCard({ r, onOpen, i }) {
       className="panel group flex animate-rise flex-col p-5 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-forest/40 hover:shadow-[0_24px_40px_-30px_rgb(23_58_40/.7)] focus-visible:-translate-y-0.5">
       <div className="flex items-start justify-between gap-3">
         <span className={`rounded-full px-2.5 py-1 text-[12.5px] font-semibold ${qualityTone[r.quality]}`}>{qualityLabel[r.quality]}</span>
-        <span className="num rounded-full bg-cream-2 px-2.5 py-1 text-[12.5px] font-medium text-muted">{r.bid_count} {r.bid_count === 1 ? 'bid' : 'bids'}</span>
+        <span className="num rounded-full bg-cream-2 px-2.5 py-1 text-[12.5px] font-medium text-muted">{r.bid_count} {r.bid_count === 1 ? 'offer' : 'offers'}</span>
       </div>
       <p className="display num mt-4 text-[38px] leading-none text-forest-deep">{Number(r.quantity_l).toLocaleString('en-PK')} L</p>
       <p className="mt-1.5 text-[15.5px] font-semibold">{milkLabel[r.milk_type]}</p>
       <p className="mt-1 text-[14.5px] text-muted">{who(r.business_type)} in {r.delivery_city}</p>
 
-      <dl className="mt-4 grid grid-cols-2 gap-3 rounded-2xl bg-cream px-4 py-3 text-[14px]">
-        <div><dt className="text-[12.5px] text-muted">Needed by</dt><dd className="num font-semibold">{date(r.required_date)}</dd></div>
-        <div><dt className="text-[12.5px] text-muted">Target price</dt><dd className="num font-semibold">{r.target_price ? `${rs(r.target_price)} / L` : 'Best offer'}</dd></div>
+      <dl className="mt-4 grid grid-cols-3 gap-3 rounded-2xl bg-cream px-4 py-3 text-[14px]">
+        <div><dt className="text-[12.5px] text-muted">Needed by</dt><dd className="num font-semibold">{date(r.required_date).replace(/ \d{4}$/, '')}</dd></div>
+        <div><dt className="text-[12.5px] text-muted">Target</dt><dd className="num font-semibold">{r.target_price ? rs(r.target_price) : 'Open'}</dd></div>
+        <div><dt className="text-[12.5px] text-muted">Lowest offer</dt><dd className={`num font-semibold ${r.lowest_offer ? 'text-forest' : 'text-muted'}`}>{r.lowest_offer ? rs(r.lowest_offer) : 'None yet'}</dd></div>
       </dl>
 
       <div className="mt-4"><TimeLeft r={r} /></div>
@@ -102,7 +104,7 @@ function DetailPanel({ r, onClose }) {
             ['Needed by', date(r.required_date)],
             ['Target price', r.target_price ? `${rs(r.target_price)} per litre` : 'No target, best offer'],
             ['Order value at target', total ? rs(total) : '—'],
-            ['Bids so far', `${r.bid_count}`],
+            ['Offers so far', `${r.bid_count}`],
             ['Bidding closes', dateTime(r.bid_deadline)],
           ].map(([k, v]) => (
             <div key={k} className="flex justify-between gap-6 py-3.5 text-[15px]"><dt className="text-muted">{k}</dt><dd className="num text-right font-semibold">{v}</dd></div>
@@ -111,10 +113,15 @@ function DetailPanel({ r, onClose }) {
 
         <div className="px-6 pb-4 pt-2"><TimeLeft r={r} /></div>
 
+        <section className="px-6 pb-5">
+          <p className="mb-3 font-semibold">Offers so far</p>
+          <OffersList requirementId={r.id} target={r.target_price} />
+        </section>
+
         <div className="mx-6 rounded-2xl bg-cream px-5 py-4 text-[14.5px]">
           <p className="font-semibold">What happens next</p>
           <ol className="mt-2 space-y-1.5 text-muted">
-            <li>1. Verified collection centers send a sealed price.</li>
+            <li>1. Verified collection centers post their price here.</li>
             <li>2. The buyer compares bids and picks one.</li>
             <li>3. The chosen center delivers by the date above.</li>
           </ol>
@@ -241,7 +248,7 @@ export default function PublicRequests() {
               <ol className="mt-4 space-y-4">
                 {[
                   ['A business posts a need', 'Litres, milk type, quality, date and a target price.'],
-                  ['Centers send a price', 'Each verified center sends one sealed bid.'],
+                  ['Centers post offers', 'Every offer is visible here, so prices stay fair.'],
                   ['The buyer picks one', 'The chosen center delivers and tracks the order.'],
                 ].map(([t, d], i) => (
                   <li key={t} className="flex gap-3">

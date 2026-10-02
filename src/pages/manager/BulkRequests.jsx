@@ -38,7 +38,7 @@ export default function BulkRequests() {
 
   return (
     <>
-      <PageHeader title="Bulk requests" description="Restaurants, hotels and shops looking for milk in bulk. Only the buyer sees your price, never other centers." />
+      <PageHeader title="Bulk requests" description="Restaurants, hotels and shops looking for milk in bulk. Every offer is public, and the buyer picks one." />
 
       <div className="mb-4">
         <Segmented value={tab} onChange={setTab} options={[

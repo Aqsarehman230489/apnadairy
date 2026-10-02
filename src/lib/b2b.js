@@ -98,6 +98,17 @@ export async function centerOrders() {
   return data
 }
 
+// ---------- open offers (visible to everyone) ----------
+export async function publicBids(requirementId) {
+  const { data, error } = await supabase
+    .from('public_bids')
+    .select('*')
+    .eq('requirement_id', requirementId)
+    .order('price_per_l')
+  if (error) throw error
+  return data
+}
+
 // ---------- actions (all checked again in the database) ----------
 const rpc = async (fn, args) => {
   const { data, error } = await supabase.rpc(fn, args)

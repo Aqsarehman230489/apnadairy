@@ -31,8 +31,8 @@ const modules = [
     id: 'b2b', label: 'Bulk bidding', icon: 'gavel', pos: { x: 15, y: 50 }, status: 'Live now', to: '/requests',
     img: '/media/cold-chain-delivery.webp', alt: 'A chilled milk delivery being handed over at a customer’s door',
     title: 'Businesses post, centers bid',
-    text: 'Restaurants, hotels and shops post how much milk they need. Verified centers send sealed bids and the buyer picks the best one.',
-    points: ['Sealed bids, compared on one price ladder', 'Best three qualifying bids ranked for the buyer', 'Order tracked from dispatch to delivery'],
+    text: 'Restaurants, hotels and shops post how much milk they need. Verified centers bid in the open, everyone can see the offers, and the buyer picks one.',
+    points: ['Every offer visible on the public board', 'Best three qualifying bids ranked for the buyer', 'Order tracked from dispatch to delivery'],
   },
 ]
 
@@ -43,15 +43,15 @@ export default function ModuleDial() {
   const m = modules.find((x) => x.id === active)
 
   return (
-    <section id="modules" className="mx-auto max-w-[1320px] px-4 py-24 sm:px-8 sm:py-32">
-      <Reveal className="max-w-3xl">
-        <h2 className="display text-[44px] text-forest-deep sm:text-[64px]">One network. Four working parts.</h2>
-        <p className="mt-4 max-w-xl text-[18px] text-muted">Pick a part of the platform to see what it does and where it is in the build.</p>
+    <section id="modules" className="screen mx-auto w-full max-w-[1320px] px-4 py-20 sm:px-8 lg:py-8">
+      <Reveal className="flex flex-wrap items-end justify-between gap-x-10 gap-y-3">
+        <h2 className="display text-[40px] text-forest-deep sm:text-[clamp(40px,6.2vh,58px)]">One network. Four working parts.</h2>
+        <p className="max-w-md text-[17px] text-muted">Pick a part of the platform to see what it does and where it is in the build.</p>
       </Reveal>
 
-      <div className="mt-14 grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
+      <div className="mt-10 grid items-center gap-10 lg:mt-[clamp(16px,3vh,40px)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
         <Reveal>
-          <div role="group" aria-label="Platform modules" className="relative mx-auto aspect-square w-full max-w-[520px]">
+          <div role="group" aria-label="Platform modules" className="relative mx-auto aspect-square w-full max-w-[min(500px,calc(100svh-300px))]">
             <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full" aria-hidden>
               <circle cx="50" cy="50" r="35" fill="none" stroke="#1f4d36" strokeOpacity=".3" strokeWidth=".5" strokeDasharray="2.4 2" className="dial-spin" />
               <circle cx="50" cy="50" r="22" fill="none" stroke="#1f4d36" strokeOpacity=".12" strokeWidth=".5" />
@@ -86,21 +86,21 @@ export default function ModuleDial() {
 
         <div key={m.id} className="animate-rise">
           <figure className="relative overflow-hidden rounded-[28px]">
-            <img src={m.img} alt={m.alt} className="aspect-[4/3] w-full object-cover" loading="lazy" />
+            <img src={m.img} alt={m.alt} className="aspect-[16/10] w-full object-cover lg:max-h-[calc(100svh-400px)]" loading="lazy" />
             <span className={`absolute left-4 top-4 rounded-full px-3 py-1 text-[13px] font-semibold backdrop-blur ${m.status === 'Live now' ? 'bg-haldi text-forest-deep' : 'bg-cream/90 text-forest-deep'}`}>{m.status}</span>
             <figcaption className="absolute inset-x-4 bottom-4 rounded-2xl bg-forest-deep/85 p-4 text-cream backdrop-blur-md sm:inset-x-6 sm:bottom-6 sm:p-5">
               <p className="display text-[22px]">{m.title}</p>
               <p className="mt-1 text-[14.5px] text-cream/80">{m.text}</p>
             </figcaption>
           </figure>
-          <ul className="mt-6 space-y-2.5">
+          <ul className="mt-5 space-y-2">
             {m.points.map((p) => (
               <li key={p} className="flex items-start gap-3 text-[16px]">
                 <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-mint-soft text-[12px] font-bold text-forest">✓</span>{p}
               </li>
             ))}
           </ul>
-          {m.to && <Link to={m.to} className="btn-primary mt-6">See live bulk requests</Link>}
+          {m.to && <Link to={m.to} className="btn-primary mt-5">See live bulk requests</Link>}
         </div>
       </div>
     </section>

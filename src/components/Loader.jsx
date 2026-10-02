@@ -1,8 +1,10 @@
+import { MilkChurn } from './Farm'
+
 export default function Loader({ label = 'Loading' }) {
   return (
-    <div className="grid min-h-full place-items-center bg-cream" role="status">
-      <div className="flex items-center gap-3 text-sm text-muted">
-        <span className="h-4 w-4 animate-spin rounded-full border-2 border-line border-t-forest motion-reduce:animate-none" />
+    <div className="grid min-h-[60vh] place-items-center" role="status">
+      <div className="flex flex-col items-center gap-3 text-sm text-muted">
+        <span className="animate-bounce motion-reduce:animate-none"><MilkChurn size={40} /></span>
         {label}…
       </div>
     </div>

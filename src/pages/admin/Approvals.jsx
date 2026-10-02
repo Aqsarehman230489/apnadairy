@@ -1,5 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../../lib/supabase'
+import { useUi } from '../../context/UiContext'
+import { SkeletonRows } from '../../components/Skeleton'
 import PageHeader from '../../components/PageHeader'
 import Alert from '../../components/Alert'
 import Badge from '../../components/Badge'
@@ -24,6 +26,7 @@ export default function Approvals() {
   const [error, setError] = useState('')
   const [docsByUser, setDocsByUser] = useState({})
   const [viewing, setViewing] = useState(null)
+  const { toast, confirm } = useUi()
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -48,13 +51,22 @@ export default function Approvals() {
 
   useEffect(() => { load() }, [load])
 
-  const act = async (id, next) => {
+  const act = async (row, next) => {
+    const name = row.center_name ?? row.business_name
     let reason = null
-    if (next === 'rejected' || next === 'suspended') {
-      reason = window.prompt('Reason (optional):') ?? null
+    if (next !== 'active') {
+      const answer = await confirm({
+        title: next === 'rejected' ? `Reject ${name}?` : `Suspend ${name}?`,
+        body: next === 'rejected' ? 'They will see that their application was not approved.' : 'They lose access to the portal until you reactivate them.',
+        input: 'Reason (optional, shown to them)',
+        confirmLabel: next === 'rejected' ? 'Reject' : 'Suspend', danger: true,
+      })
+      if (!answer) return
+      reason = typeof answer === 'string' ? answer : null
     }
-    const { error } = await supabase.rpc('set_verification', { p_kind: tab.id, p_id: id, p_status: next, p_reason: reason })
-    if (error) return setError(error.message)
+    const { error } = await supabase.rpc('set_verification', { p_kind: tab.id, p_id: row.id, p_status: next, p_reason: reason })
+    if (error) return toast(error.message, 'error')
+    toast(next === 'active' ? `${name} approved.` : next === 'rejected' ? `${name} rejected.` : `${name} suspended.`)
     load()
   }
 
@@ -84,7 +96,7 @@ export default function Approvals() {
             </tr>
           </thead>
           <tbody>
-            {loading && <tr><td colSpan={7} className="text-center text-muted">Loading…</td></tr>}
+            {loading && <SkeletonRows cols={7} />}
             {!loading && rows.length === 0 && (
               <tr><td colSpan={7}><EmptyState title={`No ${status} applications`}>New sign-ups appear under Pending.</EmptyState></td></tr>
             )}
@@ -122,13 +134,13 @@ export default function Approvals() {
                 <td>
                   <div className="flex justify-end gap-2">
                     {r.verification_status !== 'active' && (
-                      <button onClick={() => act(r.id, 'active')} className="btn-primary btn-sm">Approve</button>
+                      <button onClick={() => act(r, 'active')} className="btn-primary btn-sm">Approve</button>
                     )}
                     {r.verification_status === 'pending' && (
-                      <button onClick={() => act(r.id, 'rejected')} className="btn-danger btn-sm">Reject</button>
+                      <button onClick={() => act(r, 'rejected')} className="btn-danger btn-sm">Reject</button>
                     )}
                     {r.verification_status === 'active' && (
-                      <button onClick={() => act(r.id, 'suspended')} className="btn-secondary btn-sm">Suspend</button>
+                      <button onClick={() => act(r, 'suspended')} className="btn-secondary btn-sm">Suspend</button>
                     )}
                   </div>
                 </td>

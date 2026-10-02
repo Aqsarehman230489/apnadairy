@@ -57,10 +57,10 @@ supabase/       numbered sql files, one per module
 
 ## How B2B bidding works (for viva)
 
-1. A **verified business** posts a bulk requirement: quantity, milk type, date, city, quality, optional fat minimum and target price, and a bidding deadline.
+1. A **verified business** posts a bulk requirement: quantity, milk type (cow / buffalo / mixed), quality (farm fresh / standard / premium), date, city, optional target price and a bidding deadline.
 2. It appears on the **public board** (`/requests`, no buyer name or address) and on the **bulk request board** for verified milk collection centers.
-3. Each center sends one **sealed bid** (price/L, litres, delivery date, fat %, max milk age). Centers never see each other's bids; they can update or withdraw until the deadline.
-4. The buyer sees every bid on a **price ladder** against their target. The system ranks the **best three qualifying bids** (full quantity, on time, meets fat minimum) cheapest first; others are listed with the reason they fall short.
+3. Each center sends one **sealed bid** (price/L, litres, delivery date, and freshness: max hours since milking on arrival). Centers never see each other's bids; they can update or withdraw until the deadline.
+4. The buyer sees every bid on a **price ladder** against their target. The system ranks the **best three qualifying bids** (full quantity, on time, and under 24 h old when the buyer asked for farm fresh) cheapest first; others are listed with the reason they fall short.
 5. Accepting a bid (`accept_bid`) is one database transaction: the bid becomes *accepted*, the rest *not selected*, the requirement *awarded*, and a **bulk order** is created.
 6. The center moves the order *confirmed → dispatched → delivered*; either side can cancel while it is still confirmed.
 

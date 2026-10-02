@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState, useCallback } from 'react'
 import { supabase } from '../../lib/supabase'
+import { useUi } from '../../context/UiContext'
+import { SkeletonRows } from '../../components/Skeleton'
 import { useAuth } from '../../context/AuthContext'
 import { roleLabel } from '../../lib/roles'
 import PageHeader from '../../components/PageHeader'
@@ -20,6 +22,7 @@ export default function Users() {
   const [search, setSearch] = useState('')
   const [role, setRole] = useState('all')
   const [busy, setBusy] = useState(null)
+  const { toast, confirm } = useUi()
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -43,12 +46,13 @@ export default function Users() {
 
   const countOf = (r) => users.filter((u) => u.role === r).length
 
-  const run = async (userId, rpc, args, confirmText) => {
-    if (confirmText && !window.confirm(confirmText)) return
-    setError(''); setBusy(userId)
-    const { error } = await supabase.rpc(rpc, { p_user: userId, ...args })
+  const run = async (u, rpc, args, ask) => {
+    if (ask && !(await confirm(ask))) return
+    setBusy(u.id)
+    const { error } = await supabase.rpc(rpc, { p_user: u.id, ...args })
     setBusy(null)
-    if (error) return setError(error.message)
+    if (error) return toast(error.message, 'error')
+    toast(`${u.full_name} updated.`)
     load()
   }
 
@@ -78,7 +82,7 @@ export default function Users() {
             </tr>
           </thead>
           <tbody>
-            {loading && <tr><td colSpan={5} className="text-center text-muted">Loading…</td></tr>}
+            {loading && <SkeletonRows cols={5} />}
             {!loading && shown.length === 0 && (
               <tr><td colSpan={5}><EmptyState title="No users match">Try a different name, email or role.</EmptyState></td></tr>
             )}
@@ -101,18 +105,18 @@ export default function Users() {
                     <div className={`flex justify-end gap-2 ${busy === u.id ? 'opacity-50 pointer-events-none' : ''}`}>
                       {!isMe && u.status === 'active' && (
                         isAdmin ? (
-                          <button onClick={() => run(u.id, 'set_admin', { p_make_admin: false }, `Remove admin access from ${u.full_name}?`)}
+                          <button onClick={() => run(u, 'set_admin', { p_make_admin: false }, { title: `Remove admin access from ${u.full_name}?`, body: 'They go back to their original account type.', confirmLabel: 'Remove admin', danger: true })}
                             className="btn-secondary btn-sm">Remove admin</button>
                         ) : (
-                          <button onClick={() => run(u.id, 'set_admin', { p_make_admin: true }, `Give ${u.full_name} full admin access?`)}
+                          <button onClick={() => run(u, 'set_admin', { p_make_admin: true }, { title: `Make ${u.full_name} an admin?`, body: 'Admins can approve accounts, suspend users and see everything on the platform.', confirmLabel: 'Make admin' })}
                             className="btn-secondary btn-sm">Make admin</button>
                         )
                       )}
                       {canToggle && (u.status === 'active' ? (
-                        <button onClick={() => run(u.id, 'set_user_status', { p_status: 'suspended' }, `Suspend ${u.full_name}?`)}
+                        <button onClick={() => run(u, 'set_user_status', { p_status: 'suspended' }, { title: `Suspend ${u.full_name}?`, body: 'They are signed out of the portal until you reactivate them.', confirmLabel: 'Suspend', danger: true })}
                           className="btn-danger btn-sm">Suspend</button>
                       ) : (
-                        <button onClick={() => run(u.id, 'set_user_status', { p_status: 'active' })}
+                        <button onClick={() => run(u, 'set_user_status', { p_status: 'active' })}
                           className="btn-primary btn-sm">Reactivate</button>
                       ))}
                       {['pending', 'rejected'].includes(u.status) && (

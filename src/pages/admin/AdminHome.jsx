@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
-import PageHeader from '../../components/PageHeader'
+import { useLoad } from '../../lib/useLoad'
+import { rs } from '../../lib/format'
+import WelcomeBanner from '../../components/WelcomeBanner'
 import StatCard, { StatRow } from '../../components/StatCard'
 
 const count = async (table, filter = {}) => {
@@ -14,29 +15,39 @@ const count = async (table, filter = {}) => {
 
 export default function AdminHome() {
   const { profile } = useAuth()
-  const [s, setS] = useState({})
-
-  useEffect(() => {
-    Promise.all([
+  const { data: s } = useLoad(async () => {
+    const [users, pm, pb, am, bb, open, orders] = await Promise.all([
       count('profiles'),
       count('area_managers', { verification_status: 'pending' }),
       count('business_profiles', { verification_status: 'pending' }),
       count('area_managers', { verification_status: 'active' }),
       count('business_profiles', { verification_status: 'active' }),
-    ]).then(([users, pm, pb, am, bb]) => setS({ users, pending: pm + pb, am, bb }))
-  }, [])
+      count('bulk_requirements', { status: 'open' }),
+      supabase.from('bulk_orders').select('total_amount, status').then(({ data }) => data ?? []),
+    ])
+    const live = orders.filter((o) => o.status !== 'cancelled')
+    return { users, pending: pm + pb, am, bb, open, value: live.reduce((n, o) => n + Number(o.total_amount), 0) }
+  })
 
   return (
     <>
-      <PageHeader title={`Welcome, ${profile.full_name.split(' ')[0]}`} description="Accounts waiting for approval and the state of the platform.">
-        <Link to="/admin/approvals" className="btn-primary">Review approvals</Link>
-      </PageHeader>
+      <WelcomeBanner name={profile.full_name.split(' ')[0]}
+        line={s ? (s.pending ? `${s.pending} ${s.pending === 1 ? 'account is' : 'accounts are'} waiting for you.` : 'Everyone is approved. All clear.') : ' '}>
+        <Link to="/admin/approvals" className="btn-haldi">Review approvals</Link>
+        <Link to="/admin/bulk-market" className="btn-on-dark">Bulk market</Link>
+      </WelcomeBanner>
       <StatRow>
-        <StatCard label="Registered users" value={s.users} note="all roles" />
-        <StatCard label="Pending approvals" value={s.pending} note="managers + businesses" />
-        <StatCard label="Active area managers" value={s.am} note="verified centers" />
-        <StatCard label="Verified businesses" value={s.bb} note="bulk buyers" />
+        <StatCard label="Waiting for approval" value={s?.pending} note="centers and businesses" tone="haldi" />
+        <StatCard label="Verified centers" value={s?.am} note="area managers" />
+        <StatCard label="Verified businesses" value={s?.bb} note="bulk buyers" />
+        <StatCard label="Registered users" value={s?.users} note="all roles" />
       </StatRow>
+      <div className="mt-4">
+        <StatRow cols={3}>
+          <StatCard label="Bulk requests open" value={s?.open} note="taking bids now" />
+          <StatCard label="Bulk order value" value={s?.value} format={(n) => rs(Math.round(n))} note="excluding cancelled" tone="green" />
+        </StatRow>
+      </div>
     </>
   )
 }

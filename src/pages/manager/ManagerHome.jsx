@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext'
 import { requestBoard, myBids, centerOrders, milkLabel } from '../../lib/b2b'
 import { useLoad } from '../../lib/useLoad'
 import { rs, litres, date, relative } from '../../lib/format'
-import PageHeader from '../../components/PageHeader'
+import WelcomeBanner from '../../components/WelcomeBanner'
 import StatCard, { StatRow } from '../../components/StatCard'
 import EmptyState from '../../components/EmptyState'
 
@@ -26,16 +26,18 @@ export default function ManagerHome() {
 
   return (
     <>
-      <PageHeader title={c?.center_name ?? ' '}
-        description={c ? `${isCenter ? 'Milk collection center' : 'Dairy byproducts seller'} in ${c.city}${c.address ? `, ${c.address}` : ''}.` : null} />
+      <WelcomeBanner name={profile.full_name.split(' ')[0]} line={c ? c.center_name : ' '}>
+        {isCenter && <Link to="/manager/bulk-requests" className="btn-haldi">See bulk requests</Link>}
+        {isCenter && <Link to="/manager/bulk-orders" className="btn-on-dark">Orders to deliver</Link>}
+      </WelcomeBanner>
 
       {isCenter && (
         <>
           <StatRow>
-            <StatCard label="Open bulk requests" value={data?.board?.length} note={`${unbid.length} you haven't bid on`} />
-            <StatCard label="Bids waiting" value={bidOn.size} note="for the buyer's decision" />
-            <StatCard label="Orders to deliver" value={active.length} note="confirmed or on the way" />
-            <StatCard label="Bulk sales won" value={rs(won.reduce((n, o) => n + Number(o.total_amount), 0))} note={`${won.length} orders`} />
+            <StatCard label="Open bulk requests" value={data?.board?.length} note={`${unbid.length} you haven't bid on`} tone="haldi" />
+            <StatCard label="Bids waiting" value={data ? bidOn.size : null} note="for the buyer's decision" />
+            <StatCard label="Orders to deliver" value={data ? active.length : null} note="confirmed or on the way" />
+            <StatCard label="Bulk sales won" value={data ? won.reduce((n, o) => n + Number(o.total_amount), 0) : null} format={(n) => rs(Math.round(n))} note={`${won.length} orders`} tone="green" />
           </StatRow>
 
           <section className="mt-10">

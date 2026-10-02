@@ -30,11 +30,12 @@ export default function Journey() {
         </p>
       </Reveal>
       <Reveal delay={0.1}>
-        <figure className="group relative mt-10 overflow-hidden rounded-[32px] bg-forest-deep shadow-[0_40px_80px_-50px_rgb(23_58_40/.8)]">
+        {/* width capped so the whole 16:9 film fits on screen with room around it */}
+        <figure className="group relative mx-auto mt-10 w-full max-w-[min(1040px,calc((100svh-200px)*16/9))] overflow-hidden rounded-[28px] bg-forest-deep shadow-[0_40px_80px_-50px_rgb(23_58_40/.8)]">
           <video ref={video} className="aspect-video w-full object-cover" src="/media/apnadairy-journey.mp4" poster="/media/apnadairy-journey-poster.jpg"
             autoPlay muted loop playsInline preload="metadata"
             aria-label="Animated film: milk travels from a Pakistani farm to the area manager's milk shop, is tested and priced, then delivered to a family" />
-          <div className="absolute bottom-5 right-5 flex gap-2">
+          <div className="absolute bottom-4 right-4 flex gap-2">
             <button onClick={toggleSound}
               className={`rounded-full px-4 py-2 text-[14px] font-semibold backdrop-blur transition-all hover:scale-105 active:scale-95 ${muted ? 'bg-haldi text-forest-deep' : 'bg-cream/90 text-forest-deep'}`}>
               {muted ? 'Sound on' : 'Mute'}

@@ -1,9 +1,9 @@
-export default function Loader({ label = 'loading' }) {
+export default function Loader({ label = 'Loading' }) {
   return (
-    <div className="min-h-full grid place-items-center bg-cream">
-      <div className="flex items-center gap-3 font-mono text-xs uppercase tracking-widest text-muted">
-        <span className="h-2 w-2 rounded-full bg-forest pulse-dot" />
-        {label}
+    <div className="grid min-h-full place-items-center bg-cream" role="status">
+      <div className="flex items-center gap-3 text-sm text-muted">
+        <span className="h-4 w-4 animate-spin rounded-full border-2 border-line border-t-forest motion-reduce:animate-none" />
+        {label}…
       </div>
     </div>
   )

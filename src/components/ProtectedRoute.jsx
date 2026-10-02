@@ -9,7 +9,7 @@ export default function ProtectedRoute({ allow }) {
 
   if (loading) return <Loader />
   if (!session) return <Navigate to="/login" replace />
-  if (!profile) return <Loader label="setting up your account" />
+  if (!profile) return <Loader label="Setting up your account" />
   if (profile.status !== 'active') return <Navigate to="/pending" replace />
   if (allow && !allow.includes(profile.role)) return <Navigate to={homeFor(profile.role)} replace />
 

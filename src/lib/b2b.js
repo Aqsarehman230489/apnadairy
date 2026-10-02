@@ -1,0 +1,103 @@
+import { supabase } from './supabase'
+
+export const milkLabel = { cow: 'Cow milk', buffalo: 'Buffalo milk', mixed: 'Mixed milk' }
+export const qualityLabel = { standard: 'Standard', high: 'High', premium: 'Premium' }
+export const orderSteps = ['confirmed', 'dispatched', 'delivered']
+
+// a bid "qualifies" when it covers the full quantity, arrives on time and meets the fat minimum
+export function bidIssues(bid, req) {
+  const issues = []
+  if (Number(bid.quantity_l) < Number(req.quantity_l)) issues.push(`only ${Number(bid.quantity_l)} L of ${Number(req.quantity_l)} L`)
+  if (bid.delivery_date > req.required_date) issues.push('delivers after your date')
+  if (req.min_fat && (bid.fat_percent == null || Number(bid.fat_percent) < Number(req.min_fat))) issues.push('fat below your minimum')
+  return issues
+}
+
+// best 3 qualifying bids by price, then everything else
+export function rankBids(bids, req) {
+  const live = bids.filter((b) => b.status === 'submitted' || b.status === 'accepted')
+  const byPrice = (a, b) => a.price_per_l - b.price_per_l || a.delivery_date.localeCompare(b.delivery_date)
+  const qualifying = live.filter((b) => bidIssues(b, req).length === 0).sort(byPrice)
+  const top = qualifying.slice(0, 3)
+  const others = live.filter((b) => !top.includes(b)).sort(byPrice)
+  return { top, others }
+}
+
+const BID_FIELDS = 'id, price_per_l, quantity_l, delivery_date, fat_percent, max_age_hours, notes, status, created_at, updated_at, area_manager_id'
+
+// ---------- business ----------
+export async function myRequirements() {
+  const { data, error } = await supabase
+    .from('bulk_requirements')
+    .select('*, bids(id, status)')
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return data.map((r) => ({ ...r, bid_count: r.bids.filter((b) => b.status === 'submitted' || b.status === 'accepted').length }))
+}
+
+export async function requirementWithBids(id) {
+  const { data, error } = await supabase
+    .from('bulk_requirements')
+    .select(`*, bids(${BID_FIELDS}, center:area_managers(center_name, city))`)
+    .eq('id', id)
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function businessOrders() {
+  const { data, error } = await supabase
+    .from('bulk_orders')
+    .select('*, center:area_managers(center_name, city), requirement:bulk_requirements(milk_type, quality)')
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return data
+}
+
+// ---------- milk center ----------
+export async function requestBoard() {
+  const { data, error } = await supabase.from('request_board').select('*').order('bid_deadline')
+  if (error) throw error
+  return data
+}
+
+export async function myBids() {
+  const { data, error } = await supabase
+    .from('bids')
+    .select(`${BID_FIELDS}, requirement:bulk_requirements(id, milk_type, quantity_l, required_date, delivery_city, target_price, status, bid_deadline)`)
+    .order('updated_at', { ascending: false })
+  if (error) throw error
+  return data
+}
+
+export async function requirementForCenter(id) {
+  const { data, error } = await supabase
+    .from('bulk_requirements')
+    .select('*, business:business_profiles(business_name, business_type, city)')
+    .eq('id', id)
+    .single()
+  if (error) throw error
+  const { data: bids } = await supabase.from('bids').select(BID_FIELDS).eq('requirement_id', id)
+  return { ...data, my_bid: bids?.[0] ?? null }
+}
+
+export async function centerOrders() {
+  const { data, error } = await supabase
+    .from('bulk_orders')
+    .select('*, buyer:business_profiles(business_name, business_type), requirement:bulk_requirements(milk_type, quality)')
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return data
+}
+
+// ---------- actions (all checked again in the database) ----------
+const rpc = async (fn, args) => {
+  const { data, error } = await supabase.rpc(fn, args)
+  if (error) throw error
+  return data
+}
+export const placeBid = (a) => rpc('place_bid', a)
+export const withdrawBid = (id) => rpc('withdraw_bid', { p_bid: id })
+export const acceptBid = (id) => rpc('accept_bid', { p_bid: id })
+export const cancelRequirement = (id) => rpc('cancel_requirement', { p_requirement: id })
+export const updateBulkOrder = (id, status) => rpc('update_bulk_order', { p_order: id, p_status: status })

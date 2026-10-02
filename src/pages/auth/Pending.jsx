@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext'
 import { homeFor, roleLabel } from '../../lib/roles'
 import AuthShell from '../../components/AuthShell'
 import Loader from '../../components/Loader'
+import Badge from '../../components/Badge'
 import DocumentUpload from '../../components/DocumentUpload'
 
 const copy = {
@@ -15,24 +16,22 @@ export default function Pending() {
   const { session, profile, loading, signOut, refreshProfile } = useAuth()
   if (loading) return <Loader />
   if (!session) return <Navigate to="/login" replace />
-  if (!profile) return <Loader label="setting up your account" />
+  if (!profile) return <Loader label="Setting up your account" />
   if (profile.status === 'active') return <Navigate to={homeFor(profile.role)} replace />
 
   const [title, body] = copy[profile.status] ?? copy.pending
   return (
-    <AuthShell title={title} subtitle={`${profile.full_name} · ${roleLabel[profile.role]}`}>
-      <div className="rounded-xl border border-line bg-white/60 p-5">
-        <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-widest text-amber">
-          <span className="h-2 w-2 rounded-full bg-amber pulse-dot" /> status: {profile.status}
-        </div>
-        <p className="mt-3 text-sm leading-relaxed text-ink">{body}</p>
+    <AuthShell title={title} subtitle={`${profile.full_name}, ${roleLabel[profile.role].toLowerCase()} account`}>
+      <div className="panel p-5">
+        <Badge status={profile.status} />
+        <p className="mt-3 text-[15px] leading-relaxed text-ink">{body}</p>
       </div>
       {profile.status === 'pending' && ['area_manager', 'business'].includes(profile.role) && (
         <div className="mt-4"><DocumentUpload profile={profile} /></div>
       )}
       <div className="mt-6 grid grid-cols-2 gap-3">
-        <button onClick={refreshProfile} className="btn-primary">Check again</button>
-        <button onClick={signOut} className="h-[46px] rounded-[10px] border border-line text-sm font-semibold hover:bg-cream-2">Sign out</button>
+        <button onClick={refreshProfile} className="btn-primary">Check status</button>
+        <button onClick={signOut} className="btn-secondary">Sign out</button>
       </div>
     </AuthShell>
   )

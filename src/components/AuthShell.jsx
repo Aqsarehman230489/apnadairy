@@ -1,59 +1,54 @@
+import { Link } from 'react-router-dom'
 import Logo from './Logo'
 
-const pipeline = [
-  { k: '01', t: 'Farmer delivers milk', s: 'collection center' },
-  { k: '02', t: 'IoT sensor test', s: 'temp · pH · density' },
-  { k: '03', t: 'AI price engine', s: 'recommended rate / L' },
-  { k: '04', t: 'Purchase → inventory', s: 'traceable batch' },
-  { k: '05', t: 'B2B bidding · B2C retail', s: 'businesses & customers' },
+// the route milk takes through apnadairy — a real sequence, so it is numbered
+const route = [
+  ['Collection', 'Farmer brings milk to a verified center'],
+  ['Testing', 'Sensor readings recorded per can'],
+  ['Pricing', 'Recommended rate per litre'],
+  ['Inventory', 'Purchased milk becomes a traceable batch'],
+  ['Supply', 'Sold to customers or bid on bulk orders'],
 ]
 
 export default function AuthShell({ title, subtitle, children }) {
   return (
-    <div className="min-h-full grid lg:grid-cols-[1.05fr_1fr]">
-      {/* brand side */}
-      <aside className="relative hidden lg:flex flex-col justify-between overflow-hidden bg-forest-deep text-cream p-12 grid-bg">
-        <div className="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-mint/10 blur-3xl" />
+    <div className="grid min-h-full lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+      <aside className="relative hidden flex-col justify-between overflow-hidden bg-forest-deep p-12 text-white lg:flex">
         <Logo light />
 
-        <div className="relative max-w-md">
-          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-mint mb-4">
-            dairy procurement network
-          </p>
-          <h2 className="font-display text-4xl leading-tight font-semibold">
-            From the farm gate to the market — measured, priced and traced.
+        <div className="relative max-w-[480px]">
+          <h2 className="display text-[56px] xl:text-[64px]">
+            Every litre, from the farm gate to the buyer, on record.
           </h2>
 
-          <ol className="mt-10 relative">
-            <svg className="absolute left-[15px] top-4 h-[calc(100%-32px)] w-px overflow-visible" aria-hidden>
-              <line x1="0" y1="0" x2="0" y2="100%" stroke="#a8d5ba" strokeOpacity=".5" strokeWidth="1.5" className="flow-line" />
+          <ol className="relative mt-12">
+            <svg className="absolute left-[11px] top-3 h-[calc(100%-24px)] w-[2px]" viewBox="0 0 2 100" preserveAspectRatio="none" aria-hidden>
+              <line x1="1" y1="0" x2="1" y2="100" stroke="#bfe1cf" strokeWidth="2" pathLength="1" className="route-draw" />
             </svg>
-            {pipeline.map((p, i) => (
-              <li key={p.k} className="relative flex items-start gap-4 py-2.5 rise" style={{ animationDelay: `${i * 90}ms` }}>
-                <span className="relative z-10 grid h-8 w-8 shrink-0 place-items-center rounded-full border border-mint/40 bg-forest-deep font-mono text-[11px] text-mint">
-                  {p.k}
+            {route.map(([t, d], i) => (
+              <li key={t} className="relative flex gap-5 pb-5 last:pb-0">
+                <span className="num relative z-10 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-mint text-xs font-semibold text-forest-deep">
+                  {i + 1}
                 </span>
                 <div>
-                  <p className="text-[15px] font-medium">{p.t}</p>
-                  <p className="font-mono text-[11px] text-mint/70">{p.s}</p>
+                  <p className="font-semibold leading-6">{t}</p>
+                  <p className="text-sm text-white/65">{d}</p>
                 </div>
               </li>
             ))}
           </ol>
         </div>
 
-        <div className="flex items-center gap-2 font-mono text-[11px] text-mint/70">
-          <span className="h-1.5 w-1.5 rounded-full bg-mint pulse-dot" />
-          secure portal · admins · area managers · business buyers
-        </div>
+        <p className="text-sm text-white/55">
+          Looking for milk in bulk? <Link to="/requests" className="text-white underline underline-offset-4">See open requests</Link>
+        </p>
       </aside>
 
-      {/* form side */}
       <main className="flex flex-col px-6 py-10 sm:px-12">
-        <div className="lg:hidden mb-10"><Logo /></div>
-        <div className="m-auto w-full max-w-[420px] rise">
-          <h1 className="font-display text-3xl font-semibold text-forest">{title}</h1>
-          {subtitle && <p className="mt-2 text-sm text-muted">{subtitle}</p>}
+        <div className="mb-10 lg:hidden"><Logo /></div>
+        <div className="m-auto w-full max-w-[420px]">
+          <h1 className="display text-[40px] text-ink">{title}</h1>
+          {subtitle && <p className="mt-2 text-muted">{subtitle}</p>}
           <div className="mt-8">{children}</div>
         </div>
       </main>

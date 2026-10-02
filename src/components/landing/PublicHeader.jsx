@@ -37,7 +37,21 @@ export default function PublicHeader() {
           ) : (
             <>
               <Link to="/login" className="btn-ghost btn-sm hidden sm:inline-flex">Sign in</Link>
-              <Link to="/signup" className="btn-primary btn-sm">Join ApnaDairy</Link>
+             <Link
+  to="/signup"
+  className="join-cta"
+  onMouseMove={(e) => {
+    const r = e.currentTarget.getBoundingClientRect()
+    e.currentTarget.style.setProperty('--x', `${e.clientX - r.left}px`)
+    e.currentTarget.style.setProperty('--y', `${e.clientY - r.top}px`)
+  }}
+>
+  <span className="join-cta-label">Join ApnaDairy</span>
+  <span className="join-cta-arrow" aria-hidden>
+    <svg className="a1" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+    <svg className="a2" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+  </span>
+</Link>
             </>
           )}
           <button className="btn-ghost h-10 w-10 p-0 lg:hidden" aria-label="Menu" aria-expanded={open} onClick={() => setOpen(!open)}><Icon name="menu" /></button>

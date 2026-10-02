@@ -3,7 +3,6 @@ import { supabase } from '../lib/supabase'
 import { useLoad } from '../lib/useLoad'
 import PublicHeader from '../components/landing/PublicHeader'
 import Hero from '../components/landing/Hero'
-import Marquee from '../components/landing/Marquee'
 import ModuleDial from '../components/landing/ModuleDial'
 import Problem from '../components/landing/Problem'
 import HowItWorks from '../components/landing/HowItWorks'
@@ -35,7 +34,7 @@ export default function Home() {
         {/* first screen: photo hero + marquee */}
         <div className="screen flex flex-col pb-0 lg:h-[calc(100svh-68px)]">
           <Hero live={live} />
-          <Marquee />
+        
         </div>
         <ModuleDial />
         <Problem />

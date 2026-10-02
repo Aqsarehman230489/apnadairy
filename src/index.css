@@ -110,3 +110,17 @@ textarea.input { height: auto; padding: 10px 14px; resize: vertical; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
 }
+
+/* landing page motion */
+@keyframes hero-line { from { transform: translateY(112%); } to { transform: none; } }
+@keyframes hero-zoom { from { transform: scale(1.06); } to { transform: none; } }
+@keyframes marquee { to { transform: translateX(-50%); } }
+.hero-line { animation: hero-line .8s cubic-bezier(.22,1,.36,1) both; }
+.hero-fade { animation: rise .7s cubic-bezier(.22,1,.36,1) both; }
+.hero-pop { animation: pop .6s cubic-bezier(.22,1,.36,1) both; }
+.hero-zoom { animation: hero-zoom 1.6s cubic-bezier(.22,1,.36,1) both; }
+.marquee-track { animation: marquee 38s linear infinite; }
+.marquee:hover .marquee-track { animation-play-state: paused; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+@keyframes dial-spin { to { transform: rotate(360deg); } }
+.dial-spin { transform-origin: 50px 50px; animation: dial-spin 60s linear infinite; }

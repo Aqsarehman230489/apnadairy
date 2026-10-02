@@ -5,7 +5,8 @@ import { useAuth } from '../context/AuthContext'
 import { homeFor } from '../lib/roles'
 import { milkLabel, qualityLabel } from '../lib/b2b'
 import { rs, date, relative } from '../lib/format'
-import Logo from '../components/Logo'
+import PublicHeader from '../components/landing/PublicHeader'
+import Footer from '../components/landing/Footer'
 import Alert from '../components/Alert'
 import { FarmScene, MilkChurn } from '../components/Farm'
 
@@ -24,23 +25,9 @@ export default function PublicRequests() {
 
   return (
     <div className="min-h-full bg-cream">
-      <header className="border-b border-cream/10 bg-forest-deep">
-        <div className="mx-auto flex h-16 max-w-[1100px] items-center justify-between px-4 sm:px-8">
-          <Link to="/requests" aria-label="ApnaDairy"><Logo light /></Link>
-          <nav className="flex items-center gap-2">
-            {profile ? (
-              <Link to={homeFor(profile.role)} className="btn-haldi btn-sm">Go to your portal</Link>
-            ) : (
-              <>
-                <Link to="/login" className="btn-on-dark btn-sm">Sign in</Link>
-                <Link to="/signup" className="btn-haldi btn-sm">Create account</Link>
-              </>
-            )}
-          </nav>
-        </div>
-      </header>
+      <PublicHeader />
 
-      <section className="furrows relative overflow-hidden bg-forest-deep text-cream">
+      <section className="furrows relative mx-3 overflow-hidden rounded-[28px] bg-forest-deep text-cream sm:mx-6 sm:rounded-[40px] lg:mx-8">
         <FarmScene className="pointer-events-none absolute bottom-0 right-0 hidden h-full w-[62%] [mask-image:linear-gradient(to_right,transparent,black_30%)] md:block" />
         <div className="relative mx-auto max-w-[1100px] px-4 pb-16 pt-14 sm:px-8 sm:pb-20 sm:pt-20">
           <h1 className="display max-w-[560px] text-[46px] sm:text-[64px]">Bulk doodh, wanted today.</h1>
@@ -101,6 +88,7 @@ export default function PublicRequests() {
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   )
 }

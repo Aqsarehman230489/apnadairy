@@ -10,6 +10,7 @@ import Segmented from '../../components/Segmented'
 import Badge from '../../components/Badge'
 import Alert from '../../components/Alert'
 import EmptyState from '../../components/EmptyState'
+import { SkeletonRows } from '../../components/Skeleton'
 
 export default function BulkRequests() {
   const { profile } = useAuth()
@@ -37,7 +38,7 @@ export default function BulkRequests() {
 
   return (
     <>
-      <PageHeader title="Bulk requests" description="Restaurants, hotels and other verified businesses looking for milk in bulk. Your bid is sealed: only the buyer sees it." />
+      <PageHeader title="Bulk requests" description="Restaurants, hotels and shops looking for milk in bulk. Only the buyer sees your price, never other centers." />
 
       <div className="mb-4">
         <Segmented value={tab} onChange={setTab} options={[
@@ -54,7 +55,7 @@ export default function BulkRequests() {
               <tr><th>Buyer</th><th>Needs</th><th>Delivery</th><th className="text-right">Target / L</th><th className="text-right">Bids</th><th>Closes</th><th>Your bid</th></tr>
             </thead>
             <tbody>
-              {loading && <tr><td colSpan={7} className="text-center text-muted">Loading…</td></tr>}
+              {loading && <SkeletonRows cols={7} />}
               {!loading && data?.board?.length === 0 && (
                 <tr><td colSpan={7}><EmptyState title="No open requests right now">New requests from businesses appear here as soon as they're posted.</EmptyState></td></tr>
               )}
@@ -67,13 +68,13 @@ export default function BulkRequests() {
                       <Link to={`/manager/bulk-requests/${r.id}`} onClick={(e) => e.stopPropagation()} className="num font-semibold hover:underline">
                         {litres(r.quantity_l)} {milkLabel[r.milk_type].toLowerCase()}
                       </Link>
-                      <p className="text-[13px] text-muted">{qualityLabel[r.quality]} quality{r.min_fat ? `, fat ${r.min_fat}%+` : ''}</p>
+                      <span className={`mt-1 inline-block rounded-full px-2 py-0.5 text-[12px] font-semibold ${r.quality === 'fresh' ? 'bg-mint-soft text-forest' : r.quality === 'premium' ? 'bg-haldi-soft text-amber' : 'bg-cream-2 text-muted'}`}>{qualityLabel[r.quality]}</span>
                     </td>
                     <td className="num">{date(r.required_date)}<p className="text-[13px] text-muted">{r.delivery_city}</p></td>
                     <td className="num text-right">{r.target_price ? rs(r.target_price) : <span className="text-muted">Open</span>}</td>
                     <td className="num text-right">{r.bid_count}</td>
                     <td className="text-muted">{relative(r.bid_deadline)}</td>
-                    <td>{mine && mine.status === 'submitted' ? <span className="num text-[13px] font-semibold text-forest">{rs(mine.price_per_l)}</span> : <span className="text-[13px] text-muted">Not bid</span>}</td>
+                    <td>{mine && mine.status === 'submitted' ? <Badge tone="green">{rs(mine.price_per_l)}</Badge> : <span className="btn-secondary btn-sm">Bid</span>}</td>
                   </tr>
                 )
               })}

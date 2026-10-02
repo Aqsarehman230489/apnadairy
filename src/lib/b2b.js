@@ -1,17 +1,25 @@
 import { supabase } from './supabase'
 
 export const milkLabel = { cow: 'Cow milk', buffalo: 'Buffalo milk', mixed: 'Mixed milk' }
-export const qualityLabel = { standard: 'Standard', high: 'High', premium: 'Premium' }
+export const qualityLabel = { fresh: 'Farm fresh', standard: 'Standard', premium: 'Premium' }
+export const qualityHint = {
+  fresh: 'Milked the same day',
+  standard: 'Regular raw milk',
+  premium: 'Best grade, rich and creamy',
+}
 export const orderSteps = ['confirmed', 'dispatched', 'delivered']
 
-// a bid "qualifies" when it covers the full quantity, arrives on time and meets the fat minimum
+// a bid "qualifies" when it covers the full quantity, arrives on time,
+// and — for farm fresh requests — promises milk under 24 hours old
 export function bidIssues(bid, req) {
   const issues = []
-  if (Number(bid.quantity_l) < Number(req.quantity_l)) issues.push(`only ${Number(bid.quantity_l)} L of ${Number(req.quantity_l)} L`)
-  if (bid.delivery_date > req.required_date) issues.push('delivers after your date')
-  if (req.min_fat && (bid.fat_percent == null || Number(bid.fat_percent) < Number(req.min_fat))) issues.push('fat below your minimum')
+  if (Number(bid.quantity_l) < Number(req.quantity_l)) issues.push(`Only ${Number(bid.quantity_l)} of ${Number(req.quantity_l)} L`)
+  if (bid.delivery_date > req.required_date) issues.push('Arrives after your date')
+  if (req.quality === 'fresh' && (!bid.max_age_hours || bid.max_age_hours > 24)) issues.push('Not same-day milk')
   return issues
 }
+
+export const freshnessText = (h) => (h ? `Under ${h} h old on arrival` : 'Freshness not stated')
 
 // best 3 qualifying bids by price, then everything else
 export function rankBids(bids, req) {
@@ -23,7 +31,7 @@ export function rankBids(bids, req) {
   return { top, others }
 }
 
-const BID_FIELDS = 'id, price_per_l, quantity_l, delivery_date, fat_percent, max_age_hours, notes, status, created_at, updated_at, area_manager_id'
+const BID_FIELDS = 'id, price_per_l, quantity_l, delivery_date, max_age_hours, notes, status, created_at, updated_at, area_manager_id'
 
 // ---------- business ----------
 export async function myRequirements() {

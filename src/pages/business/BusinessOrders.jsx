@@ -1,6 +1,7 @@
-import { useState } from 'react'
 import { businessOrders, updateBulkOrder, milkLabel } from '../../lib/b2b'
 import { useLoad } from '../../lib/useLoad'
+import { useUi } from '../../context/UiContext'
+import { SkeletonRows } from '../../components/Skeleton'
 import { rs, litres, date } from '../../lib/format'
 import PageHeader from '../../components/PageHeader'
 import OrderProgress from '../../components/OrderProgress'
@@ -9,24 +10,25 @@ import EmptyState from '../../components/EmptyState'
 
 export default function BusinessOrders() {
   const { data, error, loading, reload } = useLoad(businessOrders)
-  const [actionError, setActionError] = useState('')
+  const { toast, confirm } = useUi()
 
   const cancel = async (o) => {
-    if (!window.confirm(`Cancel the order with ${o.center?.center_name}?`)) return
-    try { await updateBulkOrder(o.id, 'cancelled'); reload() } catch (e) { setActionError(e.message) }
+    const ok = await confirm({ title: 'Cancel this order?', body: `${litres(o.quantity_l)} from ${o.center?.center_name}. They haven't dispatched it yet.`, confirmLabel: 'Cancel order', danger: true, cancelLabel: 'Keep order' })
+    if (!ok) return
+    try { await updateBulkOrder(o.id, 'cancelled'); await reload(); toast('Order cancelled.') } catch (e) { toast(e.message, 'error') }
   }
 
   return (
     <>
-      <PageHeader title="Bulk orders" description="Bids you accepted. The collection center updates each order as it is dispatched and delivered." />
-      <Alert>{error || actionError}</Alert>
+      <PageHeader title="Bulk orders" description="Bids you accepted. The center updates each order when the milk leaves and when it reaches you." />
+      <Alert>{error}</Alert>
       <div className="panel overflow-x-auto">
         <table className="table min-w-[860px]">
           <thead>
             <tr><th>Supplier</th><th>Milk</th><th className="text-right">Price / L</th><th className="text-right">Total</th><th>Delivery</th><th>Progress</th><th></th></tr>
           </thead>
           <tbody>
-            {loading && <tr><td colSpan={7} className="text-center text-muted">Loading…</td></tr>}
+            {loading && <SkeletonRows cols={7} />}
             {!loading && data?.length === 0 && (
               <tr><td colSpan={7}><EmptyState title="No bulk orders yet">When you accept a bid on one of your requirements, the order shows up here.</EmptyState></td></tr>
             )}

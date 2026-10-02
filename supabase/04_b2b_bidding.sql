@@ -6,7 +6,7 @@
 -- =========================================================
 
 create type milk_kind          as enum ('cow', 'buffalo', 'mixed');
-create type quality_grade      as enum ('standard', 'high', 'premium');
+create type quality_grade      as enum ('standard', 'fresh', 'premium');  -- fresh = same-day milk
 create type requirement_status as enum ('open', 'awarded', 'closed', 'cancelled');
 create type bid_status         as enum ('submitted', 'withdrawn', 'accepted', 'not_selected');
 create type bulk_order_status  as enum ('confirmed', 'dispatched', 'delivered', 'cancelled');
@@ -41,7 +41,6 @@ create table public.bulk_requirements (
   delivery_city    text not null,
   delivery_address text,
   quality          quality_grade not null default 'standard',
-  min_fat          numeric(4,2) check (min_fat is null or min_fat between 0 and 15),
   target_price     numeric(10,2) check (target_price is null or target_price > 0),
   bid_deadline     timestamptz not null,
   notes            text,
@@ -61,7 +60,6 @@ create table public.bids (
   price_per_l     numeric(10,2) not null check (price_per_l > 0),
   quantity_l      numeric(10,2) not null check (quantity_l > 0),
   delivery_date   date not null,
-  fat_percent     numeric(4,2) check (fat_percent is null or fat_percent between 0 and 15),
   max_age_hours   integer check (max_age_hours is null or max_age_hours between 1 and 96), -- milk age at delivery
   notes           text,
   status          bid_status not null default 'submitted',
@@ -137,7 +135,7 @@ create policy "business: visible to active milk centers" on public.business_prof
 -- for signed-in milk centers and admins: includes the buyer's name
 create view public.request_board as
 select r.id, r.milk_type, r.quantity_l, r.required_date, r.delivery_city, r.delivery_address,
-       r.quality, r.min_fat, r.target_price, r.bid_deadline, r.notes, r.status, r.created_at,
+       r.quality, r.target_price, r.bid_deadline, r.notes, r.status, r.created_at,
        b.business_name, b.business_type,
        (select count(*) from public.bids x where x.requirement_id = r.id and x.status = 'submitted')::int as bid_count
 from public.bulk_requirements r
@@ -148,7 +146,7 @@ where r.status = 'open' and r.bid_deadline > now()
 -- public page on the website: no buyer name or address
 create view public.public_requests as
 select r.id, r.milk_type, r.quantity_l, r.required_date, r.delivery_city,
-       r.quality, r.min_fat, r.target_price, r.bid_deadline, r.created_at,
+       r.quality, r.target_price, r.bid_deadline, r.created_at,
        b.business_type,
        (select count(*) from public.bids x where x.requirement_id = r.id and x.status = 'submitted')::int as bid_count
 from public.bulk_requirements r
@@ -165,7 +163,6 @@ create or replace function public.place_bid(
   p_price         numeric,
   p_quantity      numeric,
   p_delivery_date date,
-  p_fat           numeric default null,
   p_max_age_hours integer default null,
   p_notes         text default null
 )
@@ -194,11 +191,11 @@ begin
   end if;
 
   insert into public.bids (requirement_id, area_manager_id, price_per_l, quantity_l, delivery_date,
-                           fat_percent, max_age_hours, notes)
-  values (p_requirement, v_center, p_price, p_quantity, p_delivery_date, p_fat, p_max_age_hours, p_notes)
+                           max_age_hours, notes)
+  values (p_requirement, v_center, p_price, p_quantity, p_delivery_date, p_max_age_hours, p_notes)
   on conflict (requirement_id, area_manager_id) do update
      set price_per_l = excluded.price_per_l, quantity_l = excluded.quantity_l,
-         delivery_date = excluded.delivery_date, fat_percent = excluded.fat_percent,
+         delivery_date = excluded.delivery_date,
          max_age_hours = excluded.max_age_hours, notes = excluded.notes,
          status = 'submitted', updated_at = now()
   returning id into v_id;

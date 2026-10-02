@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
+import { UiProvider } from './context/UiContext'
 import { homeFor } from './lib/roles'
 import ProtectedRoute from './components/ProtectedRoute'
 import Loader from './components/Loader'
@@ -37,6 +38,7 @@ function Root() {
 export default function App() {
   return (
     <AuthProvider>
+      <UiProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Root />} />
@@ -83,6 +85,7 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
+      </UiProvider>
     </AuthProvider>
   )
 }

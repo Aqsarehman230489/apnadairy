@@ -8,6 +8,7 @@ import Segmented from '../../components/Segmented'
 import Badge from '../../components/Badge'
 import Alert from '../../components/Alert'
 import EmptyState from '../../components/EmptyState'
+import { SkeletonRows } from '../../components/Skeleton'
 
 const filters = [
   { value: 'open', label: 'Receiving bids' },
@@ -26,7 +27,7 @@ export default function Requirements() {
 
   return (
     <>
-      <PageHeader title="My requirements" description="Post how much milk you need and when. Verified collection centers send you sealed bids, and you choose one.">
+      <PageHeader title="My requirements" description="Post how much milk you need and when. Verified collection centers send you their price, and you pick one.">
         <Link to="/business/requirements/new" className="btn-primary">Post a requirement</Link>
       </PageHeader>
 
@@ -41,7 +42,7 @@ export default function Requirements() {
             <tr><th>Requirement</th><th>Delivery</th><th className="text-right">Target</th><th className="text-right">Bids</th><th>Bidding closes</th><th>Status</th></tr>
           </thead>
           <tbody>
-            {loading && <tr><td colSpan={6} className="text-center text-muted">Loading…</td></tr>}
+            {loading && <SkeletonRows cols={6} />}
             {!loading && rows.length === 0 && (
               <tr><td colSpan={6}>
                 <EmptyState title={filter === 'open' ? 'No requirements are taking bids' : 'Nothing here yet'}
@@ -56,11 +57,11 @@ export default function Requirements() {
                   <Link to={`/business/requirements/${r.id}`} className="font-semibold text-ink hover:underline" onClick={(e) => e.stopPropagation()}>
                     {litres(r.quantity_l)} {milkLabel[r.milk_type].toLowerCase()}
                   </Link>
-                  <p className="text-[13px] text-muted">{qualityLabel[r.quality]} quality{r.min_fat ? `, fat ${r.min_fat}%+` : ''}</p>
+                  <p className="text-[13px] text-muted">{qualityLabel[r.quality]}</p>
                 </td>
                 <td className="num">{date(r.required_date)}<p className="text-[13px] text-muted">{r.delivery_city}</p></td>
                 <td className="num text-right">{r.target_price ? rs(r.target_price) : <span className="text-muted">Open</span>}</td>
-                <td className="num text-right font-semibold">{r.bid_count}</td>
+                <td className="text-right"><span className={`num inline-grid h-7 min-w-7 place-items-center rounded-full px-2 text-[13px] font-semibold ${r.bid_count ? 'bg-haldi-soft text-amber' : 'bg-cream-2 text-muted'}`}>{r.bid_count}</span></td>
                 <td className="text-muted">{r.status === 'open' ? (new Date(r.bid_deadline) > new Date() ? relative(r.bid_deadline) : 'Closed, choose a bid') : '—'}</td>
                 <td><Badge status={r.status === 'open' ? 'open' : r.status}>{r.status === 'open' ? 'Receiving bids' : undefined}</Badge></td>
               </tr>

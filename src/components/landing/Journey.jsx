@@ -2,6 +2,9 @@ import { useRef, useState } from 'react'
 import Reveal from './Reveal'
 
 // the illustrated farm-to-home film (source in tools/journey-animation)
+// sized so the whole frame, its heading and its controls fit on one screen
+const FRAME = 'max-w-[min(900px,calc((100svh-400px)*16/9+24px))]'
+
 export default function Journey() {
   const video = useRef(null)
   const [playing, setPlaying] = useState(true)
@@ -22,28 +25,28 @@ export default function Journey() {
   }
 
   return (
-    <section id="journey" className="mx-auto max-w-[1320px] px-4 py-24 sm:px-8 sm:py-32">
-      <Reveal className="flex flex-wrap items-end justify-between gap-6">
-        <h2 className="display max-w-2xl text-[44px] text-forest-deep sm:text-[64px]">Farm se ghar tak.</h2>
-        <p className="max-w-md text-[17px] text-muted">
-          From milking at sunrise to the area manager's shop, the sensor test, a fair price, and a family's doorstep. Turn the sound on.
+    <section id="journey" className="px-4 py-20 sm:px-8 sm:py-24">
+      <Reveal className={`mx-auto w-full text-center ${FRAME}`}>
+        <h2 className="display text-[38px] text-forest-deep sm:text-[50px]">Farm se ghar tak</h2>
+        <p className="mx-auto mt-2 max-w-[540px] text-[16.5px] text-muted">
+          One minute with the milk: from a farm at sunrise to the area manager's shop, a fair price, and a family's door.
         </p>
       </Reveal>
+
       <Reveal delay={0.1}>
-        {/* width capped so the whole 16:9 film fits on screen with room around it */}
-        <figure className="group relative mx-auto mt-10 w-full max-w-[min(1040px,calc((100svh-200px)*16/9))] overflow-hidden rounded-[28px] bg-forest-deep shadow-[0_40px_80px_-50px_rgb(23_58_40/.8)]">
-          <video ref={video} className="aspect-video w-full object-cover" src="/media/apnadairy-journey.mp4" poster="/media/apnadairy-journey-poster.jpg"
+        <figure className={`mx-auto mt-8 w-full rounded-[32px] border border-line bg-surface p-3 shadow-[0_40px_80px_-50px_rgb(23_58_40/.7)] ${FRAME}`}>
+          <video ref={video} className="aspect-video w-full rounded-[22px] bg-forest-deep object-cover" src="/media/apnadairy-journey.mp4" poster="/media/apnadairy-journey-poster.jpg"
             autoPlay muted loop playsInline preload="metadata"
             aria-label="Animated film: milk travels from a Pakistani farm to the area manager's milk shop, is tested and priced, then delivered to a family" />
-          <div className="absolute bottom-4 right-4 flex gap-2">
-            <button onClick={toggleSound}
-              className={`rounded-full px-4 py-2 text-[14px] font-semibold backdrop-blur transition-all hover:scale-105 active:scale-95 ${muted ? 'bg-haldi text-forest-deep' : 'bg-cream/90 text-forest-deep'}`}>
-              {muted ? 'Sound on' : 'Mute'}
-            </button>
-            <button onClick={togglePlay} className="rounded-full bg-cream/90 px-4 py-2 text-[14px] font-semibold text-forest-deep backdrop-blur transition-transform hover:scale-105 active:scale-95">
-              {playing ? 'Pause' : 'Play'}
-            </button>
-          </div>
+          <figcaption className="flex flex-wrap items-center justify-between gap-3 px-2 pb-1 pt-3">
+            <span className="text-[14px] text-muted">{muted ? 'Playing without sound' : 'Sound on'}</span>
+            <span className="flex gap-2">
+              <button onClick={toggleSound} className={`btn-sm ${muted ? 'btn-haldi' : 'btn-secondary'}`}>
+                {muted ? 'Turn sound on' : 'Mute'}
+              </button>
+              <button onClick={togglePlay} className="btn-secondary btn-sm">{playing ? 'Pause' : 'Play'}</button>
+            </span>
+          </figcaption>
         </figure>
       </Reveal>
     </section>

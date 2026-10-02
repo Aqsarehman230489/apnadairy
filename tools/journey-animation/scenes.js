@@ -20,6 +20,7 @@ function scene1(t) {
   <defs><linearGradient id="dawn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3c27e"/><stop offset=".6" stop-color="#fde3b3"/><stop offset="1" stop-color="#fff1d6"/></linearGradient></defs>
   <rect width="1280" height="720" fill="url(#dawn)"/>
   ${sun(1040, sunY, 56)}
+  ${clouds(150, 14, 0.7)}
   ${birds(lt, 120, 140)}
   <path d="M0 430 C200 380 380 400 560 420 S900 380 1280 410 V720 H0 Z" fill="#9cbf8f" opacity=".7"/>
   <path d="M0 470 C260 440 520 460 760 470 S1100 450 1280 460 V720 H0 Z" fill="#7aa86f"/>
@@ -30,6 +31,7 @@ function scene1(t) {
   <rect x="1010" y="380" width="250" height="190" fill="${C.mud}"/>
   <rect x="995" y="370" width="280" height="18" fill="${C.mudDark}"/>
   ${[0, 1, 2, 3, 4, 5, 6].map((i) => `<rect x="${1000 + i * 40}" y="362" width="6" height="12" fill="#7a5532"/>`).join('')}
+  <rect x="1200" y="330" width="26" height="40" fill="#8a5a33"/>${smoke(1213, 330)}
   <rect x="1150" y="450" width="60" height="120" rx="4" fill="#3f6b4f"/>
   <rect x="1040" y="430" width="50" height="40" fill="#5c3f26"/><rect x="1044" y="434" width="42" height="32" fill="#f7d58a" opacity=".6"/>
   <!-- charpai -->
@@ -41,10 +43,11 @@ function scene1(t) {
   ${buffalo(470, 660, 0.85, lt * 3 + 1.4)}
   ${woman({ x: 640, y: 640, s: 1.02, kameez: '#b8455a', dupatta: '#efc0c9', armR: -60 + Math.sin(lt * 2) * 8, holdR: `<path d="M-14 66 Q0 52 14 66 Q4 84 -10 80 Z" fill="#6d9a3e"/>`, smile: 1 })}
   ${churn(918, 640, 1.15, fill)}
+  ${pouring ? [0, 1, 2, 3].map((i) => { const q = ((lt * 2.2 + i / 4) % 1); return `<circle cx="${918 + (i - 1.5) * 18 * q}" cy="${640 - 110 * 1.15 + 14 - q * 26 + q * q * 30}" r="${3.5 - q * 2}" fill="${C.milk}"/>` }).join('') : ''}
   ${pouring ? `<path d="M${hx + 8} ${hy + 6} Q${hx + 40} ${hy + 30} ${918} ${640 - 96 * 1.15 + 6}" stroke="${C.milk}" stroke-width="${7 + Math.sin(lt * 20)}" fill="none" stroke-linecap="round"/>` : ''}
   ${man({ x: 820, y: 640, s: 1.05, kameez: '#f0ead8', head: 'pagri', pagri: '#fbf7ec', beard: true, beardColor: '#3a2a20', skin: C.skin2, armR: pourA,
     holdR: `<g transform="rotate(${-pourA * 0.6} 0 70)"><path d="M-16 62 L16 62 L12 92 L-12 92 Z" fill="#c9cfd2" stroke="#8e979c" stroke-width="2"/><ellipse cx="0" cy="62" rx="16" ry="5" fill="${C.milk}"/></g>`, armL: 10, smile: 1 })}
-  ${caption(t, 1, 'Subah savere, farm par taaza doodh', 'Fresh milk at sunrise on the farm', 0, 9)}`
+  <!--cap-->${caption(t, 1, 'Subah savere, farm par taaza doodh', 'Fresh milk at sunrise on the farm', 0, 9)}`
 }
 
 // 2 — the loader on the village road through mustard fields
@@ -72,6 +75,7 @@ function scene2(t) {
   <defs><linearGradient id="day" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9fd0e6"/><stop offset="1" stop-color="#eaf5ef"/></linearGradient></defs>
   <rect width="1280" height="720" fill="url(#day)"/>
   ${sun(1100, 120, 40, 0.6)}
+  ${clouds(120, 30, 0.95)}
   <path d="M${-sc * 0.1 % 400} 380 C200 320 400 340 640 360 S1000 320 1700 350 V720 H-400 Z" fill="#a9c9a4" opacity=".7"/>
   <rect y="400" width="1280" height="120" fill="#86b35a"/>
   ${flowers}
@@ -79,9 +83,13 @@ function scene2(t) {
   <rect y="520" width="1280" height="150" fill="#5c5f60"/>
   <rect y="516" width="1280" height="6" fill="#c8b48e"/><rect y="666" width="1280" height="54" fill="#c8a06a"/>
   ${dash}
+  ${(() => { const bx = lerp(1500, -400, seg(lt, 1.2, 7.5)); return `<rect x="${bx - 4}" y="430" width="10" height="94" fill="#6b6b6b"/><rect x="${bx - 4}" y="430" width="10" height="94" transform="translate(150 0)" fill="#6b6b6b"/>
+    <rect x="${bx - 20}" y="350" width="200" height="90" rx="10" fill="${C.forest}" stroke="${C.malai}" stroke-width="4"/>
+    <text x="${bx + 80}" y="388" text-anchor="middle" font-family="Nastaliq" font-size="24" fill="${C.haldi}">ملک سینٹر ۲ کلومیٹر</text>
+    <text x="${bx + 80}" y="426" text-anchor="middle" font-size="17" font-weight="800" fill="${C.cream}">Milk Center 2 km</text>` })()}
   ${dust}
-  ${loader(720, 640 + bounce, 2.1, lt, 4)}
-  ${caption(t, 2, 'Loader mein doodh, mohallay ki milk shop tak', 'Driven to the local milk center', 9, 17)}`
+  ${g(`rotate(${Math.sin(lt * 9) * 0.8} 720 640)`, loader(720, 640 + bounce, 2.1, lt, 4))}
+  <!--cap-->${caption(t, 2, 'Loader mein doodh, mohallay ki milk shop tak', 'Driven to the local milk center', 9, 17)}`
 }
 
 // 3 — arriving at the area manager's milk shop
@@ -104,6 +112,7 @@ function scene3(t) {
   <text x="800" y="262" text-anchor="middle" font-family="Nastaliq" font-size="40" fill="${C.haldi}">اپنا ڈیری ملک سینٹر</text>
   <text x="800" y="296" text-anchor="middle" font-size="24" font-weight="800" fill="${C.cream}">ApnaDairy Milk Center</text>
   ${Array.from({ length: 16 }, (_, i) => `<path d="M${420 + i * 47.5} 320 h47.5 v34 q-23.75 16 -47.5 0 z" fill="${i % 2 ? C.forest : C.malai}"/>`).join('')}
+  <path d="M420 360 Q800 ${392 + Math.sin(lt * 2) * 4} 1180 360" stroke="#7a6a55" stroke-width="1.5" fill="none"/>
   <rect x="460" y="370" width="680" height="230" fill="#efe4c9"/>
   <!-- chiller -->
   <rect x="980" y="380" width="140" height="220" rx="8" fill="#dfe8ea" stroke="#9fb2b7" stroke-width="4"/>
@@ -119,7 +128,7 @@ function scene3(t) {
     armL: walking ? Math.sin(lt * 9) * 14 : 6, armR: -30, holdR: `<g transform="translate(0 66) rotate(30)">${churn(0, 50, 0.55)}</g>`, smile: lt > 4 ? 1 : 0 })}
   ${bubble(840, 410, 'Assalam-o-Alaikum!', seg(lt, 3.8, 4.2) - seg(lt, 6.8, 7.1))}
   ${bubble(fx - 10, 430, 'Walaikum Assalam!', seg(lt, 5, 5.4) - seg(lt, 7.8, 8.1), true)}
-  ${caption(t, 3, 'Area manager ki milk shop par', 'At the area manager’s milk center', 17, 25.5)}`
+  <!--cap-->${caption(t, 3, 'Area manager ki milk shop par', 'At the area manager’s milk center', 17, 25.5)}`
 }
 
 // 4 — the IoT device tests the milk
@@ -138,7 +147,7 @@ function scene4(t) {
   <!-- iot device -->
   <rect x="470" y="370" width="170" height="100" rx="14" fill="#2f3b40"/>
   <rect x="486" y="384" width="100" height="56" rx="6" fill="${led ? '#c7f0d4' : '#9fc9ad'}"/>
-  <text x="536" y="418" text-anchor="middle" font-size="18" font-weight="800" fill="${C.deep}">${lt > 5.6 ? 'OK' : 'TEST'}</text>
+  <text x="536" y="418" text-anchor="middle" font-size="18" font-weight="800" fill="${C.deep}">${lt > 5.6 ? 'OK' : 'TEST'}</text><path d="M492 432 ${Array.from({ length: 12 }, (_, i) => `L${492 + i * 8} ${432 - Math.abs(Math.sin(i * 1.7)) * 8 * (i / 12 < p ? 1 : 0)}`).join(' ')}" stroke="${C.forest}" stroke-width="1.6" fill="none"/>
   <circle cx="612" cy="400" r="9" fill="${led ? '#4ade80' : '#1d6b3a'}"/>
   <text x="555" y="460" text-anchor="middle" font-size="12" fill="#cfd8dc">ApnaDairy sensor</text>
   <path d="M470 430 C 420 430, 380 ${lerp(300, 330, probeIn)}, ${lerp(380, 320, probeIn)} ${lerp(290, 330, probeIn)}" stroke="#2f3b40" stroke-width="6" fill="none"/>
@@ -152,8 +161,8 @@ function scene4(t) {
   ${rows.map(([k, v], i) => `<g opacity="${seg(lt, 1.3 + i * 0.4, 1.8 + i * 0.4)}"><rect x="784" y="${212 + i * 74}" width="372" height="62" rx="16" fill="${C.cream}"/>
     <text x="804" y="${250 + i * 74}" font-size="19" fill="#6a6f5f">${k}</text><text x="1136" y="${251 + i * 74}" text-anchor="end" font-size="23" font-weight="800" fill="${C.deep}">${v}</text></g>`).join('')}
   <rect x="784" y="520" width="372" height="12" rx="6" fill="${C.cream}"/><rect x="784" y="520" width="${372 * p}" height="12" rx="6" fill="${C.forest}"/>
-  ${okA > 0 ? g(`translate(970 584) scale(${lerp(0.6, 1, easeOut(okA))})`, `<rect x="-186" y="-30" width="372" height="58" rx="29" fill="${C.forest}"/><text x="0" y="8" text-anchor="middle" font-size="22" font-weight="800" fill="${C.cream}">Quality: Achha ✓</text>`, `opacity="${okA}"`) : ''}
-  ${caption(t, 4, 'IoT device se doodh ki jaanch', 'Every can tested by the IoT sensor', 25.5, 34.5)}`
+  ${okA > 0 ? g(`translate(970 584) scale(${lerp(0.6, 1, spring(okA))})`, `<rect x="-186" y="-30" width="372" height="58" rx="29" fill="${C.forest}"/><text x="0" y="8" text-anchor="middle" font-size="22" font-weight="800" fill="${C.cream}">Quality: Achha ✓</text>`, `opacity="${okA}"`) : ''}
+  <!--cap-->${caption(t, 4, 'IoT device se doodh ki jaanch', 'Every can tested by the IoT sensor', 25.5, 34.5)}`
 }
 
 // 5 — recommended price, farmer agrees, paid on the spot
@@ -171,7 +180,7 @@ function scene5(t) {
   ${man({ x: 250, y: 700, s: 1.45, kameez: '#f0ead8', head: 'pagri', beard: true, beardColor: '#3a2a20', skin: C.skin2, nod, smile: lt > 4.8 ? 2 : 0.5, armR: lt > 5.2 ? -40 : 0,
     holdR: lt > 5.2 ? `<rect x="-12" y="58" width="26" height="44" rx="5" fill="#222"/><rect x="-9" y="62" width="20" height="34" rx="3" fill="#c7f0d4"/>` : '' })}
   ${man({ x: 1060, y: 700, s: 1.45, flip: true, kameez: '#f3efe4', vest: C.forest, head: 'cap', beard: true, skin: C.skin1, armR: -62, smile: 1 })}
-  ${cardA > 0 ? g(`translate(640 ${lerp(300, 280, easeOut(cardA))})`, `
+  ${cardA > 0 ? g(`translate(640 ${lerp(300, 280, easeOut(cardA))}) scale(${lerp(0.7, 1, spring(cardA))})`, `
     <rect x="-250" y="-170" width="500" height="300" rx="30" fill="${C.malai}" stroke="${C.line || '#e6dbc2'}" stroke-width="3"/>
     <text x="0" y="-118" text-anchor="middle" font-size="20" fill="#6a6f5f">AI recommended price</text>
     <text x="0" y="-50" text-anchor="middle" font-size="64" font-weight="800" fill="${C.deep}">Rs 185 / L</text>
@@ -180,9 +189,9 @@ function scene5(t) {
     <text x="0" y="74" text-anchor="middle" font-size="22" font-weight="800" fill="${lt > 4.3 ? C.deep : C.cream}">${lt > 4.3 ? 'Accepted ✓' : 'Accept'}</text>`, `opacity="${cardA}"`) : ''}
   ${bubble(120, 360, 'Theek hai, manzoor!', seg(lt, 2.4, 2.8) - seg(lt, 5, 5.3))}
   ${paid > 0 ? g(`translate(640 ${lerp(720, 520, easeOut(paid))})`, `<rect x="-230" y="-40" width="460" height="80" rx="24" fill="${C.deep}"/><circle cx="-186" cy="0" r="20" fill="${C.haldi}"/><text x="-186" y="7" text-anchor="middle" font-size="20" font-weight="800" fill="${C.deep}">✓</text>
-    <text x="-152" y="-6" font-size="21" font-weight="800" fill="${C.cream}">Rs 7,400 paid to Ghulam Rasool</text><text x="-152" y="20" font-size="16" fill="${C.cream}" opacity=".7">Mobile wallet · just now</text>`) : ''}
+    <text x="-152" y="-6" font-size="21" font-weight="800" fill="${C.cream}">Rs ${Math.round(7400 * easeOut(seg(lt, 4.9, 6))).toLocaleString('en-PK')} paid to Ghulam Rasool</text><text x="-152" y="20" font-size="16" fill="${C.cream}" opacity=".7">Mobile wallet · just now</text>`) : ''}
   ${coins}
-  ${caption(t, 5, 'Munasib qeemat, foran adaigi', 'A fair price, paid on the spot', 34.5, 43)}`
+  <!--cap-->${caption(t, 5, 'Munasib qeemat, foran adaigi', 'A fair price, paid on the spot', 34.5, 43)}`
 }
 
 // 6 — milk becomes stock, listed; businesses bid and homes order
@@ -193,6 +202,7 @@ function scene6(t) {
   return `
   <rect width="1280" height="720" fill="${C.deep}"/>
   <rect width="1280" height="720" fill="url(#furrow)"/>
+  <g transform="translate(0 40)">
   <defs><pattern id="furrow" width="24" height="24" patternUnits="userSpaceOnUse" patternTransform="rotate(-28)"><rect width="2" height="24" fill="#ffffff" opacity=".05"/></pattern></defs>
   <!-- chiller with batches -->
   <rect x="80" y="110" width="330" height="470" rx="26" fill="#dfe8ea" stroke="#9fb2b7" stroke-width="5"/>
@@ -207,10 +217,11 @@ function scene6(t) {
   <text x="560" y="166" font-size="30" font-weight="800" fill="${C.deep}">500 L buffalo</text>
   <text x="560" y="194" font-size="16" fill="#6a6f5f">Hotel in Islamabad · farm fresh</text>
   ${bids.map(([n, p], i) => { const a = seg(lt, 1.6 + i * 0.9, 2.1 + i * 0.9); const mine = i === 2; const won = mine && lt > 5.4
-    return a > 0 ? g(`translate(${lerp(80, 0, easeOut(a))} 0)`, `<rect x="556" y="${226 + i * 92}" width="258" height="76" rx="18" fill="${won ? C.forest : C.malai}" stroke="${mine ? C.haldi : '#e6dbc2'}" stroke-width="${mine ? 4 : 2}"/>
+    return a > 0 ? g(`translate(${lerp(90, 0, spring(a))} 0)`, `<rect x="556" y="${226 + i * 92}" width="258" height="76" rx="18" fill="${won ? C.forest : C.malai}" stroke="${mine ? C.haldi : '#e6dbc2'}" stroke-width="${mine ? 4 : 2}"/>
       <text x="576" y="${258 + i * 92}" font-size="17" font-weight="700" fill="${won ? C.cream : C.ink}">${n}</text>
       <text x="576" y="${284 + i * 92}" font-size="15" fill="${won ? C.haldi : '#6a6f5f'}">${won ? 'Bid won ✓' : 'Sealed bid'}</text>
       <text x="796" y="${272 + i * 92}" text-anchor="end" font-size="22" font-weight="800" fill="${won ? C.haldi : C.deep}">${p}</text>`, `opacity="${a}"`) : '' }).join('')}
+  ${lt > 5.4 ? g(`translate(690 585) rotate(-10) scale(${lerp(2.2, 1, spring(seg(lt, 5.4, 6.1)))})`, `<rect x="-78" y="-30" width="156" height="60" rx="10" fill="none" stroke="${C.haldi}" stroke-width="6"/><text x="0" y="14" text-anchor="middle" font-size="36" font-weight="800" fill="${C.haldi}">WON</text>`, `opacity="${seg(lt, 5.4, 5.7)}"`) : ''}
   <!-- home order card -->
   ${seg(lt, 6, 6.6) > 0 ? g(`translate(${lerp(1300, 1060, easeOut(seg(lt, 6, 6.8)))} 380)`, `
     <rect x="-150" y="-150" width="300" height="300" rx="30" fill="${C.malai}"/>
@@ -219,7 +230,8 @@ function scene6(t) {
     <text x="-120" y="-34" font-size="17" fill="#6a6f5f">Ahmed family, G-11</text>
     <rect x="-120" y="0" width="240" height="56" rx="28" fill="${C.haldi}"/><text x="0" y="36" text-anchor="middle" font-size="20" font-weight="800" fill="${C.deep}">Out for delivery</text>
     ${churn(80, 130, 0.6)}`) : ''}
-  ${caption(t, 6, 'Listing, bids aur ghar ke orders', 'Listed: businesses bid, homes order', 43, 51.5)}`
+  </g>
+  <!--cap-->${caption(t, 6, 'Listing, bids aur ghar ke orders', 'Listed: businesses bid, homes order', 43, 51.5)}`
 }
 
 // 7 — delivery through the city to a family's door
@@ -234,6 +246,8 @@ function scene7(t) {
   return `
   <defs><linearGradient id="city" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbd9a0"/><stop offset="1" stop-color="#fff2d9"/></linearGradient></defs>
   <rect width="1280" height="720" fill="url(#city)"/>
+  ${clouds(110, 18, 0.85)}
+  ${kite(760, 120, '#d9445a', '#f2c14e', 0)}${kite(1010, 80, '#2f8f5b', '#e2a93b', 2)}${kite(420, 150, '#e2a93b', '#d9445a', 4)}
   <!-- shops with urdu boards -->
   <rect x="0" y="200" width="260" height="400" fill="#e2c6a0"/><rect x="20" y="230" width="220" height="56" rx="6" fill="#2d6b8a"/><text x="130" y="270" text-anchor="middle" font-family="Nastaliq" font-size="30" fill="#fff">کریانہ اسٹور</text>
   <rect x="270" y="250" width="240" height="350" fill="#d6b28a"/><rect x="290" y="276" width="200" height="56" rx="6" fill="#b6332e"/><text x="390" y="316" text-anchor="middle" font-family="Nastaliq" font-size="30" fill="#fff">نان ہاؤس</text>
@@ -254,13 +268,13 @@ function scene7(t) {
   ${doorOpen > 0.3 ? `
     ${man({ x: 1040, y: 610, s: 1.05, flip: true, kameez: '#eae4d4', head: 'topi', beard: true, skin: C.skin2, smile: 1, armR: -20 })}
     ${woman({ x: 1110, y: 610, s: 1.02, flip: true, kameez: '#6c4f9e', dupatta: '#c7b6e6', smile: 1 })}
-    ${woman({ x: 960, y: 610, s: 0.62, flip: true, kameez: '#e07a3a', dupatta: '#f3c38f', smile: 1, armL: lerp(0, -60, handP), holdL: handP > 0.95 ? bottle(0, 92) : '' })}` : ''}
+    ${woman({ x: 960, y: 610, s: 0.62, flip: true, kameez: '#e07a3a', dupatta: '#f3c38f', smile: 1, hop: lt > 7 && lt < 8.6 ? -Math.abs(Math.sin((lt - 7) * 6)) * 14 : 0, armL: lerp(0, -60, handP), holdL: handP > 0.95 ? bottle(0, 92) : '' })}` : ''}
   ${bike(riding ? bx : 690, 640, 0.95, lt, riding, riding)}
   ${!riding ? man({ x: 830, y: 610, s: 1, kameez: '#5c7f9a', shalwar: '#4b6a82', head: 'helmet', beard: true, skin: C.skin1, armR: lerp(-10, -80, handP), smile: 1,
     holdR: handP > 0 && handP < 0.95 ? bottle(0, 92) : '' }) : ''}
   ${bubble(1150, 330, 'JazakAllah!', seg(lt, 7.2, 7.6) - seg(lt, 10, 10.4), true)}
   ${lt > 7.4 ? [0, 1, 2].map((i) => { const q = ((lt - 7.4) * 0.6 + i / 3) % 1; return `<path d="M${980 + i * 30} ${420 - q * 120} c-6 -8 -18 -4 -14 6 l14 14 l14 -14 c4 -10 -8 -14 -14 -6z" fill="#d9445a" opacity="${1 - q}"/>` }).join('') : ''}
-  ${caption(t, 7, 'Taaza doodh, ghar ki dehleez par', 'Fresh milk at the family’s door', 51.5, 62)}`
+  <!--cap-->${caption(t, 7, 'Taaza doodh, ghar ki dehleez par', 'Fresh milk at the family’s door', 51.5, 62)}`
 }
 
 // 8 — end card
@@ -274,21 +288,27 @@ function scene8(t) {
   <path d="M0 600 C200 560 420 560 640 590 S1040 560 1280 580 V720 H0 Z" fill="#cfe5d3" opacity=".18"/>
   <path d="M0 640 C260 610 520 620 760 640 S1100 620 1280 630 V720 H0 Z" fill="#cfe5d3" opacity=".28"/>
   ${sun(1060, 170, 50, 0.8)}
-  ${g(`translate(640 ${lerp(330, 300, a)}) scale(${lerp(0.7, 1, a)})`, `${churn(0, 0, 1.6)}`, `opacity="${a}"`)}
-  <text x="640" y="${lerp(440, 410, a)}" text-anchor="middle" font-size="84" font-weight="800" fill="${C.cream}" opacity="${a}">ApnaDairy</text>
-  <text x="640" y="470" text-anchor="middle" font-family="Nastaliq" font-size="38" fill="${C.haldi}" opacity="${seg(lt, 0.8, 1.6)}">اپنا ڈیری — خالص دودھ</text>
+  ${g(`translate(640 ${lerp(330, 300, a)}) scale(${lerp(0.4, 1, spring(seg(lt, 0.1, 1.3)))})`, `${churn(0, 0, 1.6)}`, `opacity="${a}"`)}
+  <text x="640" y="410" text-anchor="middle" font-size="84" font-weight="800" fill="${C.cream}">${'ApnaDairy'.split('').map((ch, i) => { const q = easeOut(seg(lt, 0.4 + i * 0.07, 0.9 + i * 0.07)); return `<tspan dy="${i === 0 ? 0 : 0}" opacity="${q}">${ch}</tspan>` }).join('')}</text>
+  <text x="640" y="470" text-anchor="middle" font-family="Nastaliq" font-size="38" fill="${C.haldi}" opacity="${seg(lt, 0.8, 1.6)}">اپنا ڈیری   خالص دودھ</text>
   <text x="640" y="548" text-anchor="middle" font-size="26" fill="${C.cream}" opacity="${seg(lt, 1.4, 2.2) * 0.85}">Farm se ghar tak, har qadam record par.</text>
   <text x="640" y="584" text-anchor="middle" font-size="20" fill="${C.cream}" opacity="${seg(lt, 1.8, 2.6) * 0.6}">From the farm to your home, every step on record.</text>`
 }
 
 const scenes = [scene1, scene2, scene3, scene4, scene5, scene6, scene7, scene8]
+// [start zoom, end zoom, focus x, focus y] for each scene
+const CAMERA = [[1.0, 1.07, 820, 520], [1.02, 1.0, 700, 560], [1.0, 1.06, 760, 450], [1.0, 1.1, 960, 360], [1.0, 1.05, 640, 340], [1.04, 1.0, 640, 360], [1.0, 1.06, 960, 470], [1.06, 1.0, 640, 360]]
 
 function render(t) {
+  setT(t)
   let out = ''
   SCENES.forEach(([a, b], i) => {
     if (t >= a && t < b + 0.6) {
       const alpha = i === 0 ? 1 : ease(seg(t, a, a + 0.6))
-      out += `<g opacity="${alpha}">${scenes[i](t)}</g>`
+      const [art, cap = ''] = scenes[i](t).split('<!--cap-->')
+      const [z0, z1, fx, fy] = CAMERA[i]
+      const z = lerp(z0, z1, ease(seg(t, a, b + 0.6)))
+      out += `<g opacity="${alpha}"><g transform="translate(${fx} ${fy}) scale(${z}) translate(${-fx} ${-fy})">${art}</g>${cap}</g>`
     }
   })
   // fade from and to black at the very start and end

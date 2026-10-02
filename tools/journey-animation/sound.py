@@ -168,6 +168,7 @@ def creak(t0):
 for k in range(14): bird(rng.uniform(0.5, 8.5))
 moo(1.4); moo(6.2)
 pour(3.1, 4.3)
+whoosh(11.0, 0.7, 0.05)  # roadside board passing
 # scene 2 — loader on the road
 engine(9.0, 8.4, 52, 0.16); horn(14.8)
 # scene 3 — milk shop
@@ -182,7 +183,7 @@ whoosh(34.8); pop(38.8, 0.16); cash(39.3)
 # scene 6 — listing and bids
 whoosh(43.4); for_bids = [44.7, 45.6, 46.5]
 for b in for_bids: pop(b)
-chime(48.4, (1047, 1319, 1568), 0.14); whoosh(49.0, 0.5, 0.08); pop(49.4)
+chime(48.4, (1047, 1319, 1568), 0.14); step(48.42); step(48.45); whoosh(49.0, 0.5, 0.08); pop(49.4)
 # scene 7 — delivery
 engine(51.5, 4.4, 110, 0.10)
 engine(51.8, 5.0, 70, 0.05)   # rickshaw passing

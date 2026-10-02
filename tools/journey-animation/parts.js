@@ -7,6 +7,10 @@ const C = {
   milk: '#fffdf6', skin1: '#a8693f', skin2: '#8a5533', skin3: '#b97c52', hair: '#22160f',
 }
 
+let T = 0 // current time, set by render()
+const setT = (t) => { T = t }
+const spring = (p) => (p <= 0 ? 0 : p >= 1 ? 1 : 1 - Math.cos(p * Math.PI * 2.5) * Math.exp(-5 * p))
+const blinkOf = (seed) => ((T * 0.55 + seed * 0.37) % 3.1) < 0.12
 const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v))
 const seg = (t, a, b) => clamp((t - a) / (b - a))
 const ease = (p) => (p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2)
@@ -46,7 +50,7 @@ function head(o) {
     <ellipse cx="0" cy="-194" rx="17" ry="20" fill="${s}"/>
     <ellipse cx="-12" cy="-193" rx="4" ry="6" fill="${s}"/>
     ${hair}
-    <circle cx="8" cy="-198" r="2.2" fill="#24160e"/>
+    <ellipse cx="8" cy="-198" rx="2.3" ry="${blinkOf(o.seed ?? (o.x || 0) * 0.011) ? 0.4 : 2.3}" fill="#24160e"/>
     <path d="M4 -205 Q9 -207 13 -205" stroke="#24160e" stroke-width="1.6" fill="none"/>
     ${beard}${mustache}${smile}${top}`)
 }
@@ -64,7 +68,8 @@ function man(o = {}) {
     ${vest}
     ${head({ ...o, skin })}
     ${arm(22, -162, o.armR ?? -8, k, skin, o.holdR || '')}`
-  return g(`translate(${o.x || 0} ${o.y || 0}) scale(${o.flip ? -(o.s || 1) : o.s || 1} ${o.s || 1})`, g(`translate(0 ${o.bounce || 0})`, body))
+  const bob = o.walk ? -Math.abs(Math.sin(o.walk)) * 5 : Math.sin(T * 2.4 + (o.seed || 0)) * 1.3
+  return g(`translate(${o.x || 0} ${o.y || 0}) scale(${o.flip ? -(o.s || 1) : o.s || 1} ${o.s || 1})`, g(`translate(0 ${(o.bounce || 0) + bob})`, body))
 }
 
 // woman in shalwar kameez with dupatta over her head and shoulders
@@ -77,12 +82,12 @@ function woman(o = {}) {
     <path d="M-20 -120 Q0 -112 20 -120" stroke="${C.haldi}" stroke-width="3" fill="none" opacity=".8"/>
     <rect x="-6" y="-176" width="12" height="12" fill="${skin}"/>
     <ellipse cx="0" cy="-193" rx="16" ry="19" fill="${skin}"/>
-    <circle cx="7" cy="-197" r="2.1" fill="#24160e"/>
+    <ellipse cx="7" cy="-197" rx="2.2" ry="${blinkOf((o.seed ?? (o.x || 0) * 0.011) + 1.3) ? 0.4 : 2.2}" fill="#24160e"/>
     ${o.smile ? `<path d="M5 -183 Q9 -179 13 -183" stroke="#5a2e1a" stroke-width="1.8" fill="none" stroke-linecap="round"/>` : ''}
     <path d="M-24 -190 Q-24 -222 0 -222 Q22 -222 21 -200 Q12 -212 -2 -211 Q-16 -208 -16 -186 L-18 -150 L-30 -60 L-38 -64 L-28 -160 Z" fill="${d}"/>
     <path d="M21 -200 Q26 -180 24 -164 Q10 -160 -2 -168" fill="none" stroke="${d}" stroke-width="7" stroke-linecap="round"/>
     ${arm(20, -160, o.armR ?? -10, k, skin, o.holdR || '')}`
-  return g(`translate(${o.x || 0} ${o.y || 0}) scale(${o.flip ? -(o.s || 1) : o.s || 1} ${o.s || 1})`, body)
+  return g(`translate(${o.x || 0} ${(o.y || 0) + (o.hop || 0) + Math.sin(T * 2.2 + (o.seed || 2)) * 1.2}) scale(${o.flip ? -(o.s || 1) : o.s || 1} ${o.s || 1})`, body)
 }
 
 // ---------- animals & props ----------
@@ -92,7 +97,7 @@ function buffalo(x, y, s = 1, chew = 0, flip = false) {
     <rect x="-70" y="-60" width="16" height="60" rx="5" fill="#262626"/><rect x="-40" y="-60" width="16" height="60" rx="5" fill="#2e2e2e"/>
     <rect x="30" y="-60" width="16" height="60" rx="5" fill="#262626"/><rect x="55" y="-60" width="16" height="60" rx="5" fill="#2e2e2e"/>
     <ellipse cx="0" cy="-80" rx="92" ry="46" fill="#333"/>
-    <path d="M-90 -88 Q-112 -70 -104 -40" stroke="#333" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M-90 -88 Q${-112 + Math.sin(chew * 1.3) * 10} -70 ${-104 + Math.sin(chew * 1.3 + 1) * 14} -40" stroke="#333" stroke-width="6" fill="none" stroke-linecap="round"/>
     ${g(`translate(0 ${hb})`, `
       <ellipse cx="96" cy="-74" rx="30" ry="24" fill="#2b2b2b"/>
       <ellipse cx="118" cy="-64" rx="15" ry="12" fill="#4a4a4a"/>
@@ -177,4 +182,31 @@ function bike(x, y, s, t, riding, rider = true) {
     <rect x="-118" y="-96" width="70" height="56" rx="8" fill="${C.malai}" stroke="${C.forest}" stroke-width="4"/>
     <text x="-83" y="-62" text-anchor="middle" font-size="13" font-weight="800" fill="${C.forest}">ApnaDairy</text>
     ${rider ? g('translate(-14 36) scale(.85)', man({ kameez: '#5c7f9a', shalwar: '#4b6a82', head: 'helmet', beard: true, skin: C.skin1, armR: -78, armL: -70, noLegs: true })) : ''}`)
+}
+
+// drifting clouds
+function clouds(y, speed, opacity = 0.9) {
+  return [0, 1, 2].map((i) => {
+    const x = ((i * 520 + T * speed) % 1700) - 260
+    const yy = y + (i % 2) * 40
+    return `<g opacity="${opacity}"><ellipse cx="${x}" cy="${yy}" rx="70" ry="24" fill="#fffaf0"/><ellipse cx="${x + 40}" cy="${yy - 16}" rx="44" ry="26" fill="#fffaf0"/><ellipse cx="${x - 36}" cy="${yy - 8}" rx="34" ry="18" fill="#fffaf0"/></g>`
+  }).join('')
+}
+
+// chulha smoke curling up from a chimney
+function smoke(x, y) {
+  return [0, 1, 2, 3].map((i) => {
+    const p = ((T * 0.35 + i / 4) % 1)
+    return `<circle cx="${x + Math.sin(p * 6 + i) * 12 + p * 30}" cy="${y - p * 140}" r="${8 + p * 22}" fill="#efe6d6" opacity="${0.55 * (1 - p)}"/>`
+  }).join('')
+}
+
+// patang (kite) on a string, gently swaying
+function kite(x, y, col, col2, seed = 0) {
+  const sw = Math.sin(T * 1.6 + seed) * 8, dy = Math.sin(T * 1.1 + seed) * 6
+  const kx = x + sw, ky = y + dy
+  return `<path d="M${kx} ${ky + 26} Q${kx - 80} ${ky + 160} ${kx - 160} ${ky + 330}" stroke="#7a6a55" stroke-width="1.2" fill="none" opacity=".7"/>
+    <g transform="rotate(${sw * 0.8} ${kx} ${ky})"><path d="M${kx} ${ky - 26} L${kx + 22} ${ky} L${kx} ${ky + 26} L${kx - 22} ${ky} Z" fill="${col}"/>
+    <path d="M${kx} ${ky - 26} L${kx} ${ky + 26} M${kx - 22} ${ky} Q${kx} ${ky - 10} ${kx + 22} ${ky}" stroke="#ffffffaa" stroke-width="1.5" fill="none"/>
+    <path d="M${kx} ${ky + 26} l-6 12 h12 z" fill="${col2}"/></g>`
 }

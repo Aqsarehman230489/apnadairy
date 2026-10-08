@@ -152,6 +152,16 @@ export default function RecordMilk() {
               </div>
             </div>
           )}
+          {done.answered && (
+            <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-haldi-soft px-4 py-3 text-left">
+              <div>
+                <p className="text-[12.5px] text-amber">Now due to {farmer.full_name.split(' ')[0]}</p>
+                <p className="display num text-[24px] text-forest-deep">{rs(Math.round(Number(done.row?.total_amount ?? qty * price)))}</p>
+                <p className="text-[12px] text-muted">Added to what you owe this farmer. It stays due until you send the payment and the farmer confirms it.</p>
+              </div>
+              <Link to={`/manager/farmers/${farmer.id}`} className="btn-secondary btn-sm"><Icon name="wallet" size={15} />Pay the farmer</Link>
+            </div>
+          )}
           {done.answered && done.row?.receipt_no && (
             <button className="mt-3 text-[13.5px] font-semibold text-forest hover:underline" onClick={() => setReceipt(done.row)}>View receipt {done.row.receipt_no}</button>
           )}

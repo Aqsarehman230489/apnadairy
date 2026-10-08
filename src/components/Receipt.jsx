@@ -15,8 +15,11 @@ export default function Receipt({ kind, data, center, farmer, onClose }) {
     : [['Farmer', farmer?.full_name ?? data.farmer?.full_name], ['Milk', `${litres(data.quantity_l)} ${milkLabel[data.milk_type].toLowerCase()} milk, ${data.shift}`],
        ['Tested', `${dateTime(data.reading_at ?? data.collected_at)}${data.test_source === 'manual' ? ', readings typed by hand' : ''}`],
        ['Grade', data.quality ? gradeLabel[data.quality] : '—'], ['Market rate (AI)', `${rs(data.ai_price_per_l)} per litre`],
-       ['Price paid', `${rs(data.price_per_l)} per litre`], ['Accepted by farmer', dateTime(data.decided_at)]]
+       ['Price', `${rs(data.price_per_l)} per litre`], ['Accepted by farmer', dateTime(data.decided_at)],
+       ['Payment', data.payment === 'paid' ? `Paid${data.paid_at ? `, ${dateTime(data.paid_at)}` : ''}` : data.payout_id ? 'Sent, waiting for the farmer to confirm' : 'Due to the farmer, not paid yet']]
   const total = isPayout ? data.amount : data.total_amount
+  // a milk receipt is a record of the sale: the money is owed until a payment is sent and the farmer confirms it
+  const totalLabel = isPayout ? 'Total paid' : data.payment === 'paid' ? 'Total paid' : 'Total due'
   return createPortal(
     <div className="receipt-overlay fixed inset-0 z-[80] grid place-items-center p-4" role="dialog" aria-modal="true" aria-label="Receipt">
       <div className="no-print absolute inset-0 bg-forest-deep/45 backdrop-blur-[2px]" onClick={onClose} />
@@ -36,7 +39,7 @@ export default function Receipt({ kind, data, center, farmer, onClose }) {
             {rows.map(([k, v]) => <div key={k} className="flex justify-between gap-4"><dt className="text-muted">{k}</dt><dd className="text-right font-medium">{v}</dd></div>)}
           </dl>
           <div className="flex items-baseline justify-between border-t border-dashed border-line pt-4">
-            <span className="font-semibold">Total</span>
+            <span className="font-semibold">{totalLabel}</span>
             <span className="display num text-[28px]">{rs(total)}</span>
           </div>
           <p className="mt-4 text-center text-[11.5px] text-muted">Recorded on ApnaDairy. The farmer can see this receipt in the app.</p>

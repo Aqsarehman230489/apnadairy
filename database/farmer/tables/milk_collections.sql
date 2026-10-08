@@ -1,0 +1,72 @@
+-- ============================================================================
+-- Table: milk_collections  (LIVE WEB TABLE — reference only)
+-- Project: apnadairy-web (https://aquatwwnpvnmirkqnhlp.supabase.co) ONLY.
+--
+-- This table ALREADY EXISTS in the web project (650 rows on 2026-10-08).
+-- This file documents its live columns (verified 2026-10-08 via the web
+-- PostgREST OpenAPI spec + a sample-row read).
+-- DO NOT run this file against any database.
+-- RLS/grant posture is owned by the web project — see ../rls/README.md.
+--
+-- Role in the farmer portal (manager-driven daily sales flow):
+--   * Every milk sale/pickup is a row here. The manager-driven offer step is
+--     a row with status = 'offered' (provisional price_per_l = market price);
+--     the farmer accepts/refuses, and the manager confirms the purchase.
+--     There is NO separate "offers" table in the web project — the old
+--     mobile-project offers design was dropped (see README.md).
+--   * IoT readings: temperature_c, ph, ec_ms, tds_ppm, density.
+--   * AI outputs: freshness_score (0-100), ai_price_per_l, freshness_hours,
+--     quality, adulteration_risk, spoilage_risk, model_quality, model_source.
+--   * Live status values observed: 'accepted', 'rejected'
+--     (plus 'offered' used by the farmer portal sales flow).
+-- ============================================================================
+
+-- LIVE web definition (informational; already exists):
+-- CREATE TABLE public.milk_collections (
+--     id                uuid PRIMARY KEY,
+--     area_manager_id   uuid,               -- FK -> area_managers.id
+--     farmer_id         uuid,               -- FK -> farmers.id
+--     milk_type         public.milk_kind,
+--     shift             public.milk_shift,
+--     quantity_l        numeric,
+--     collected_at      timestamptz,
+--     temperature_c     numeric,            -- IoT: milk temperature (C)
+--     ph                numeric,            -- IoT: pH
+--     density           numeric,
+--     ec_ms             numeric,            -- IoT: EC (mS/cm) at measurement temp
+--     test_source       text,
+--     device_serial     text,
+--     quality           public.quality_grade,
+--     freshness_hours   integer,
+--     adulteration_risk public.risk_level,
+--     ai_price_per_l    numeric,            -- AI-suggested price (Rs/L)
+--     ai_notes          text[],
+--     price_per_l       numeric,            -- final agreed price (Rs/L)
+--     total_amount      numeric,            -- quantity_l * price_per_l
+--     status            public.collection_status,  -- 'accepted' | 'rejected'
+--                                                  -- | 'offered' (portal flow)
+--     decided_at        timestamptz,
+--     reject_reason     text,
+--     payment           public.payment_status,
+--     paid_at           timestamptz,
+--     is_sample         boolean,
+--     tds_ppm           numeric,            -- IoT: TDS (ppm)
+--     reading_at        timestamptz,
+--     freshness_score   integer,            -- AI freshness score 0-100
+--     spoilage_risk     public.risk_level,
+--     adulteration_score integer,
+--     suspected         text,
+--     receipt_no        text,
+--     manual_reason     text,
+--     payout_id         uuid,               -- FK -> farmer_payouts.id
+--     voided_at         timestamptz,
+--     device_reading_id uuid,
+--     model_quality     text,
+--     spoilage_pct      numeric,
+--     model_source      text
+-- );
+--
+-- Sample live row (2026-10-08, read-only):
+--   quantity_l=10.00, price_per_l=201.00, total_amount=2010.00,
+--   status='rejected', freshness_score=79, ai_price_per_l=212.00,
+--   payment='unpaid'

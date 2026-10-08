@@ -1,0 +1,37 @@
+-- ============================================================================
+-- Table: farmers  (LIVE WEB TABLE — reference only)
+-- Project: apnadairy-web (https://aquatwwnpvnmirkqnhlp.supabase.co) ONLY.
+--
+-- This table ALREADY EXISTS in the web project (14 rows on 2026-10-08). This
+-- file documents its live columns (verified 2026-10-08 via the web PostgREST
+-- OpenAPI spec + a sample-row read) so the farmer backend stays aligned.
+-- DO NOT run this file against any database.
+-- RLS/grant posture is owned by the web project — see ../rls/README.md.
+--
+-- Role in the farmer portal:
+--   * Web-team-owned identity for each farmer. The farmer backend reads it
+--     (auth, dashboard, sales, payments) and inserts the row at onboarding
+--     linked via profile_id = profiles.id (the auth user).
+--   * area_manager_id = the farmer's exclusive linked manager (farmer picks
+--     ONE area manager; the manager accepts; daily sales go only to him).
+-- ============================================================================
+
+-- LIVE web definition (informational; already exists):
+-- CREATE TABLE public.farmers (
+--     id              uuid PRIMARY KEY,
+--     area_manager_id uuid,                  -- FK -> area_managers.id
+--     profile_id      uuid,                  -- FK -> profiles.id (= auth user)
+--     full_name       text,
+--     phone           text,
+--     village         text,
+--     milk_type       public.milk_kind,      -- observed: 'cow', 'buffalo'
+--     cattle_count    integer,
+--     is_active       boolean,
+--     is_sample       boolean,               -- demo/seed flag
+--     created_at      timestamptz
+-- );
+--
+-- Sample live row (2026-10-08, read-only):
+--   full_name='Muhammad Aslam', phone='03393624706', village='Mauza Sarai',
+--   milk_type='buffalo', cattle_count=8, is_active=true,
+--   area_manager_id=c64300d7-aa1b-447d-886a-b4364e8a4635

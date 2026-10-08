@@ -1,0 +1,44 @@
+-- ============================================================================
+-- Table: farmer_profiles  (LIVE WEB TABLE — reference only)
+-- Project: apnadairy-web (https://aquatwwnpvnmirkqnhlp.supabase.co) ONLY.
+--
+-- This table ALREADY EXISTS in the web project (0 rows on 2026-10-08 — the
+-- farmer portal has not onboarded anyone yet). This file documents its live
+-- columns (verified 2026-10-08 via the web PostgREST OpenAPI spec).
+-- DO NOT run this file against any database.
+-- RLS/grant posture is owned by the web project — see ../rls/README.md.
+--
+-- Role in the farmer portal:
+--   * Portal onboarding data, keyed by user_id = profiles.id (the auth
+--     user). Backend onboarding_service upserts the row at signup:
+--     city, village, address, farm_name, milk_type, cattle_count,
+--     daily_litres.
+--   * Verification state (SuperAdmin decides via the web dashboard):
+--     verified  -> verified_at IS NOT NULL
+--     rejected  -> rejection_reason IS NOT NULL (verified_at is NULL)
+--     pending   -> neither set (including "no farmer_profiles row yet")
+--     There is NO separate farmer_verifications table in the web project;
+--     the old mobile-project farmer_verifications design was dropped.
+-- ============================================================================
+
+-- LIVE web definition (informational; already exists):
+-- CREATE TABLE public.farmer_profiles (
+--     user_id           uuid PRIMARY KEY,    -- = profiles.id (= auth user)
+--     photo_path        text,
+--     city              text,
+--     village           text,
+--     address           text,
+--     latitude          double precision,
+--     longitude         double precision,
+--     farm_name         text,
+--     milk_type         public.milk_kind,    -- observed: 'cow', 'buffalo'
+--     cattle_count      integer,
+--     daily_litres      numeric,
+--     notes             text,
+--     submitted_at      timestamptz,
+--     rejection_reason  text,
+--     verified_by       uuid,
+--     verified_at       timestamptz,
+--     created_at        timestamptz,
+--     updated_at        timestamptz
+-- );

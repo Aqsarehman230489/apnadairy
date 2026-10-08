@@ -1,0 +1,30 @@
+-- ============================================================================
+-- Table: farmer_requests  (LIVE WEB TABLE — reference only)
+-- Project: apnadairy-web (https://aquatwwnpvnmirkqnhlp.supabase.co) ONLY.
+--
+-- This table ALREADY EXISTS in the web project (0 rows on 2026-10-08). This
+-- file documents its live columns (verified 2026-10-08 via the web PostgREST
+-- OpenAPI spec).
+-- DO NOT run this file against any database.
+-- RLS/grant posture is owned by the web project — see ../rls/README.md.
+--
+-- Role in the farmer portal (exclusive one-manager model):
+--   * Farmer picks a city -> sees area managers -> sends a registration
+--     request to ONE manager. The manager accepts/declines/ends the linkage.
+--   * Backend linking_service + manager_service read/write this table.
+--   * farmer_id here references farmers.id (uuid).
+-- ============================================================================
+
+-- LIVE web definition (informational; already exists):
+-- CREATE TABLE public.farmer_requests (
+--     id              uuid PRIMARY KEY,
+--     farmer_id       uuid,              -- FK -> farmers.id
+--     area_manager_id uuid,              -- FK -> area_managers.id
+--     note            text,
+--     status          text,              -- backend uses: pending | accepted |
+--                                        -- declined | cancelled | ended
+--     reason          text,
+--     created_at      timestamptz,
+--     answered_at     timestamptz,
+--     ended_at        timestamptz
+-- );

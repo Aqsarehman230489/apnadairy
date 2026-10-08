@@ -1,0 +1,34 @@
+-- ============================================================================
+-- Table: notifications  (LIVE WEB TABLE — reference only)
+-- Project: apnadairy-web (https://aquatwwnpvnmirkqnhlp.supabase.co) ONLY.
+--
+-- This table ALREADY EXISTS in the web project (6 rows on 2026-10-08). This
+-- file documents its live columns (verified 2026-10-08 via the web PostgREST
+-- OpenAPI spec).
+-- DO NOT run this file against any database.
+-- RLS/grant posture is owned by the web project — see ../rls/README.md.
+--
+-- Role in the farmer portal:
+--   * Farmer inbox. Backend notification_service reads/writes this table.
+--   * COLUMN-MAPPING NOTE (portal name -> web name; see README.md):
+--     portal "farmer_id"  -> web "user_id"   (uuid, = profiles.id)
+--     portal "message"     -> web "body"      (text)
+--     portal "type"        -> web "kind"      (text)
+--     portal "deep_link"   -> web "link"      (text)
+--     portal "read"        -> web "read_at"   (timestamptz; NULL = unread)
+--     web also has: email (boolean), emailed_at (timestamptz).
+-- ============================================================================
+
+-- LIVE web definition (informational; already exists):
+-- CREATE TABLE public.notifications (
+--     id          uuid PRIMARY KEY,
+--     user_id     uuid,            -- recipient (= profiles.id)
+--     kind        text,            -- portal "type"
+--     title       text,
+--     body        text,            -- portal "message"
+--     link        text,            -- portal "deep_link"
+--     email       boolean,         -- queued for email delivery
+--     emailed_at  timestamptz,
+--     created_at  timestamptz,
+--     read_at     timestamptz      -- portal "read": NULL = unread
+-- );

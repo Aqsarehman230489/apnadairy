@@ -1,0 +1,46 @@
+-- ============================================================================
+-- Storage: farmer-photos bucket + object policies (REFERENCE POSTURE ONLY)
+-- Project: apnadairy-web (https://aquatwwnpvnmirkqnhlp.supabase.co) ONLY.
+--
+-- The private "farmer-photos" bucket ALREADY EXISTS in the web project's
+-- storage (verified 2026-10-08). It holds farmer verification files
+-- (CNIC front/back, farm photos, profile photo), uploaded by the farmer
+-- backend (documents.py) at paths keyed by the farmer's user id.
+-- There is NO farmer_documents table — documents are bucket objects, and
+-- review state lives in farmer_profiles (verified_at / rejection_reason).
+--
+-- Access model: the backend (service_role, which bypasses RLS) uploads with
+-- its own key and mints signed URLs for the mobile app. Direct client access
+-- to this bucket should stay locked down.
+--
+-- DO NOT APPLY BLINDLY: storage.objects policies are global across ALL
+-- buckets for a role unless filtered by bucket_id. A blanket
+-- USING (false) for anon/authenticated would also affect the web app's
+-- other buckets (verification-docs, customer-*, shop-photos). Any policy
+-- change here needs web-team review and must be scoped to the
+-- farmer-photos bucket (e.g. USING (bucket_id = 'farmer-photos')).
+--
+-- Desired posture (apply only after web-team review, bucket-scoped):
+--   1. anon:      no access to farmer-photos objects.
+--   2. authenticated: no direct access to farmer-photos objects
+--      (reads go through backend-minted signed URLs).
+--   3. service_role: full access (bypasses RLS by design).
+-- ============================================================================
+
+-- Bucket already exists (idempotent reference; safe to leave):
+-- INSERT INTO storage.buckets (id, name, public)
+-- VALUES ('farmer-photos', 'farmer-photos', false)
+-- ON CONFLICT (id) DO NOTHING;
+--
+-- Example bucket-scoped lock-down (REVIEW FIRST — do not run as-is):
+-- DROP POLICY IF EXISTS "farmer_photos_no_anon" ON storage.objects;
+-- CREATE POLICY "farmer_photos_no_anon" ON storage.objects
+--     FOR ALL TO anon
+--     USING (bucket_id = 'farmer-photos' AND false)
+--     WITH CHECK (bucket_id = 'farmer-photos' AND false);
+--
+-- DROP POLICY IF EXISTS "farmer_photos_no_authenticated" ON storage.objects;
+-- CREATE POLICY "farmer_photos_no_authenticated" ON storage.objects
+--     FOR ALL TO authenticated
+--     USING (bucket_id = 'farmer-photos' AND false)
+--     WITH CHECK (bucket_id = 'farmer-photos' AND false);

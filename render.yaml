@@ -1,0 +1,24 @@
+# PLACE THIS FILE AT THE REPO ROOT (next to App/) as render.yaml, then push.
+# Render -> New -> Blueprint -> select the repo. It reads this file automatically.
+
+services:
+  - type: web
+    name: apnadairy-farmer-api
+    runtime: python
+    rootDir: App/backend/farmer
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /docs
+    envVars:
+      - key: SUPABASE_WEB_URL
+        sync: false
+      - key: SUPABASE_WEB_SERVICE_KEY
+        sync: false
+      - key: SUPABASE_MOBILE_URL
+        sync: false
+      - key: SUPABASE_MOBILE_SERVICE_KEY
+        sync: false
+      - key: AUTH_DEMO_ENABLED
+        value: "false"
+      - key: DEMO_FARMER_ID
+        sync: false

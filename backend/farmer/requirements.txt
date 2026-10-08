@@ -1,0 +1,12 @@
+# Backend dependencies. Install with: pip install -r requirements.txt
+fastapi==0.142.2
+uvicorn[standard]==0.34.0
+sqlalchemy==2.1.3
+python-multipart==0.0.18
+httpx==0.28.1
+pytest==8.3.4
+supabase==2.32.0
+pydantic==2.13.5
+python-dotenv==1.1.0
+pyjwt[crypto]==2.15.1  # RS256 verification of Supabase access tokens (JWKS)
+mangum==0.19.0  # ASGI adapter: serves the FastAPI app on Vercel serverless

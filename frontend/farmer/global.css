@@ -1,0 +1,4 @@
+/* Global stylesheet for the ApnaDairy Farmer app (NativeWind v4 + Tailwind v3). */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

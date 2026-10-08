@@ -1,0 +1,30 @@
+-- ============================================================================
+-- Table: profiles  (LIVE WEB TABLE — reference only)
+-- Project: apnadairy-web (https://aquatwwnpvnmirkqnhlp.supabase.co) ONLY.
+--
+-- This table ALREADY EXISTS in the web project. This file documents its live
+-- columns (verified 2026-10-08 via the web PostgREST OpenAPI spec) so the
+-- farmer backend stays aligned. DO NOT run this file against any database.
+-- RLS/grant posture is owned by the web project — see ../rls/README.md.
+--
+-- Role in the farmer portal:
+--   * Auth creates the row at signup: {id = auth.users.id, full_name, email,
+--     phone, role = 'farmer', status = 'pending'} (1:1 with the auth user).
+--   * Backend auth.py reads/writes profiles; farmer_profiles.farmer link
+--     uses profiles.id as the user key.
+-- ============================================================================
+
+-- LIVE web definition (informational; already exists):
+-- CREATE TABLE public.profiles (
+--     id          uuid PRIMARY KEY,                 -- = auth.users.id
+--     full_name   text,
+--     email       text,
+--     phone       text,
+--     role        public.user_role,                 -- observed: 'area_manager',
+--                                                   -- 'business', 'customer',
+--                                                   -- 'farmer', 'super_admin'
+--     status      public.account_status,            -- observed via auth.py:
+--                                                   -- 'pending' | 'active' | ...
+--     created_at  timestamptz,
+--     updated_at  timestamptz
+-- );

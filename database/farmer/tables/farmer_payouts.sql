@@ -1,0 +1,42 @@
+-- ============================================================================
+-- Table: farmer_payouts  (LIVE WEB TABLE — reference only)
+-- Project: apnadairy-web (https://aquatwwnpvnmirkqnhlp.supabase.co) ONLY.
+--
+-- This table ALREADY EXISTS in the web project (61 rows on 2026-10-08). This
+-- file documents its live columns (verified 2026-10-08 via the web PostgREST
+-- OpenAPI spec + a sample-row read).
+-- DO NOT run this file against any database.
+-- RLS/grant posture is owned by the web project — see ../rls/README.md.
+--
+-- Role in the farmer portal:
+--   * Money settled to the farmer (feeds revenue/profit cards + activity).
+--     Backend payment_service reads this table (read-only at the API).
+--   * receipt_no format observed: 'AD-P-000501'.
+-- ============================================================================
+
+-- LIVE web definition (informational; already exists):
+-- CREATE TABLE public.farmer_payouts (
+--     id                   uuid PRIMARY KEY,
+--     area_manager_id      uuid,            -- FK -> area_managers.id
+--     farmer_id            uuid,            -- FK -> farmers.id
+--     amount               numeric,
+--     litres               numeric,
+--     collections          integer,
+--     method               text,            -- observed: 'jazzcash'
+--     reference            text,
+--     status               public.payout_status,
+--     receipt_no           text,
+--     farmer_note          text,
+--     created_at           timestamptz,
+--     answered_at          timestamptz,
+--     is_sample            boolean,
+--     disputed_collections uuid[],
+--     settled_outcome      text,
+--     settled_note         text,
+--     settled_at           timestamptz,
+--     settled_by           uuid
+-- );
+--
+-- Sample live row (2026-10-08, read-only):
+--   amount=2894.40, litres=14.40, collections=1, method='jazzcash',
+--   receipt_no='AD-P-000501', settled_at=NULL

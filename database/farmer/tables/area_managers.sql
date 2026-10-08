@@ -1,0 +1,36 @@
+-- ============================================================================
+-- Table: area_managers  (LIVE WEB TABLE — reference only)
+-- Project: apnadairy-web (https://aquatwwnpvnmirkqnhlp.supabase.co) ONLY.
+--
+-- This table ALREADY EXISTS in the web project (6 rows on 2026-10-08). This
+-- file documents its live columns (verified 2026-10-08 via the web PostgREST
+-- OpenAPI spec).
+-- DO NOT run this file against any database.
+-- RLS/grant posture is owned by the web project — see ../rls/README.md.
+--
+-- Role in the farmer portal:
+--   * "The area manager is the shopkeeper who verifies farmers/area only."
+--     Farmer onboarding lists managers by city; the sales flow is
+--     manager-driven: manager selects farmer -> IoT test -> live data +
+--     AI score + AI price shown to both -> manager offers -> farmer
+--     accepts/refuses.
+-- ============================================================================
+
+-- LIVE web definition (informational; already exists):
+-- CREATE TABLE public.area_managers (
+--     id                  uuid PRIMARY KEY,
+--     user_id             uuid,                  -- FK -> profiles.id
+--     type                public.area_manager_type,
+--     center_name         text,
+--     city                text,
+--     address             text,
+--     latitude            double precision,
+--     longitude           double precision,
+--     verification_status public.account_status,
+--     verified_by         uuid,
+--     verified_at         timestamptz,
+--     rejection_reason    text,
+--     created_at          timestamptz,
+--     is_demo             boolean,
+--     docs_submitted_at   timestamptz
+-- );

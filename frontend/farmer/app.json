@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "experiments": {
+      "typedRoutes": true
+    },
+    "name": "ApnaDairy",
+    "orientation": "portrait",
+    "plugins": [
+      "expo-router"
+    ],
+    "scheme": "apnadairy",
+    "slug": "apnadairy",
+    "userInterfaceStyle": "light",
+    "version": "1.0.0",
+    "splash": {
+      "image": "./assets/logo.png",
+      "backgroundColor": "#f7f1e3",
+      "resizeMode": "contain"
+    }
+  }
+}

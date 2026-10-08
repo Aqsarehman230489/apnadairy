@@ -2,7 +2,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
 import ProductImage from '../../components/ProductImage'
-import { requestBoard, myBids, qualityLabel, reqTitle, qtyText, perUnit, isMilk } from '../../lib/b2b'
+import { requestBoard, myBids, qualityLabel, reqTitle, qtyText, perUnit, isMilk, cancelledByText } from '../../lib/b2b'
 import { useLoad } from '../../lib/useLoad'
 import { rs, date, relative, cap } from '../../lib/format'
 import PageHeader from '../../components/PageHeader'
@@ -98,7 +98,9 @@ export default function BulkRequests() {
                   <td className="num">{date(b.delivery_date)}</td>
                   <td>{b.removed_at
                     ? <><Badge tone="red">Removed by ApnaDairy</Badge><p className="mt-1 max-w-[240px] text-[12px] text-muted">{b.removed_reason}</p></>
-                    : <Badge status={b.status}>{b.status === 'submitted' ? 'Waiting for buyer' : b.status === 'accepted' ? 'Won' : undefined}</Badge>}</td>
+                    : b.status === 'cancelled' || b.order?.status === 'cancelled'
+                      ? <><Badge status="cancelled">Bid cancelled</Badge><p className="mt-1 text-[12px] text-muted">{cancelledByText(b.order, true)}</p></>
+                      : <Badge status={b.status}>{b.status === 'submitted' ? 'Waiting for buyer' : b.status === 'accepted' ? 'Won' : undefined}</Badge>}</td>
                 </tr>
               ))}
             </tbody>

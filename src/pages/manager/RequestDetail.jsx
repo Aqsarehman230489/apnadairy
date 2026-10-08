@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, useOutletContext } from 'react-router-dom'
-import { requirementForCenter, placeBid, withdrawBid, milkLabel, qualityLabel, qualityHint, gradeRule, myProductCapacity, isMilk, qtyText, perUnit, productLabel, GRADES } from '../../lib/b2b'
+import { requirementForCenter, placeBid, withdrawBid, milkLabel, qualityLabel, qualityHint, gradeRule, myProductCapacity, isMilk, qtyText, perUnit, productLabel, GRADES, cancelledByText } from '../../lib/b2b'
 import { useLoad } from '../../lib/useLoad'
 import { bidCapacity, todayKey } from '../../lib/center'
 import { useUi } from '../../context/UiContext'
@@ -83,7 +83,7 @@ function BidForm({ req, onSaved }) {
   const make = milk ? 0 : Math.max(0, Number(f.make) || 0)
   const capMax = capacity ? (milk ? Number(capacity.max_l) : Number(capacity.available) + make) : null
   const need = req.remaining_l ?? Number(req.quantity_l)
-  const maxBid = capacity ? Math.min(need, capMax) : need
+  const maxBid = capacity ? capMax : null   // more than still needed is fine, but not more than you can supply
   const overCap = capacity && Number(f.quantity) > capMax
   const makeBad = !milk && (make > Number(f.quantity) || (make > 0 && f.delivery_date <= today))
   const kind = req.milk_type === 'mixed' ? 'milk' : milkLabel[req.milk_type]?.toLowerCase()
@@ -94,7 +94,7 @@ function BidForm({ req, onSaved }) {
   const diff = t && f.price ? Number(f.price) - t : null
 
   const warnings = []
-  if (Number(f.quantity) > need) warnings.push(`Only ${Q(need)} is still needed.`)
+  if (Number(f.quantity) > need) warnings.push(`The buyer still needs ${Q(need)}. You can offer more; the buyer decides.`)
   else if (Number(f.quantity) < need) warnings.push(`You're offering less than the ${Q(need)} needed. The buyer can combine bids.`)
   if (f.delivery_date > req.required_date) warnings.push(`You'd deliver after ${date(req.required_date)}.`)
   if (lower) warnings.push(`The buyer asked for ${qualityLabel[req.quality]} milk. Your bid shows ${qualityLabel[f.grade]} clearly, and they decide.`)
@@ -103,7 +103,7 @@ function BidForm({ req, onSaved }) {
     e.preventDefault()
     const bad = firstError(
       numberError(f.price, { min: 1, max: 100000, what: 'price' }),
-      numberError(f.quantity, { min: 1, max: Math.max(1, need), whole: req.unit === 'pack', what: 'quantity' }),
+      numberError(f.quantity, { min: 1, max: 100000, whole: req.unit === 'pack', what: 'quantity' }),
       overCap ? `You can offer at most ${Q(capMax)}.` : '',
       !f.delivery_date ? 'Pick the delivery date.' : f.delivery_date < today ? 'The delivery date is in the past.' : '',
       makeBad ? 'What you will make cannot be more than the quantity, and needs at least a day.' : '',
@@ -267,8 +267,9 @@ export default function RequestDetail() {
         <aside className="lg:sticky lg:top-10 lg:self-start">
           <div className="panel animate-rise p-6">
             <div className="mb-5 flex items-center justify-between gap-3">
-              <h2 className="display text-[26px]">{mine?.status === 'submitted' || mine?.status === 'accepted' || mine?.removed_at ? 'Your bid' : 'Place your bid'}</h2>
+              <h2 className="display text-[26px]">{mine?.status === 'submitted' || mine?.status === 'accepted' || mine?.status === 'cancelled' || mine?.removed_at ? 'Your bid' : 'Place your bid'}</h2>
               {mine?.removed_at ? <Badge tone="red">Removed</Badge>
+                : mine?.status === 'cancelled' || mine?.order?.status === 'cancelled' ? <Badge status="cancelled">Bid cancelled</Badge>
                 : mine && mine.status !== 'withdrawn' && <Badge status={mine.status}>{mine.status === 'submitted' ? 'Sent' : mine.status === 'accepted' ? 'Won' : undefined}</Badge>}
             </div>
             {mine?.removed_at ? (
@@ -276,6 +277,11 @@ export default function RequestDetail() {
                 <p className="font-semibold">ApnaDairy removed your bid of {rs(mine.price_per_l)}/{perUnit(req.unit)}.</p>
                 <p className="mt-1">Reason: {mine.removed_reason}</p>
                 <p className="mt-2 text-[13px]">You cannot bid on this request again. If you think this is a mistake, contact ApnaDairy from Support.</p>
+              </div>
+            ) : mine?.status === 'cancelled' || mine?.order?.status === 'cancelled' ? (
+              <div className="rounded-2xl bg-cream-2 px-4 py-3 text-[14px]">
+                <p className="font-semibold">{cancelledByText(mine.order, true)}.</p>
+                <p className="mt-1 text-muted">Your bid of {qtyText(mine.quantity_l, req.unit)} at {rs(mine.price_per_l)}/{perUnit(req.unit)} was accepted, then the order was cancelled. It no longer counts toward this request, and it stays in your bid history.</p>
               </div>
             ) : mine?.status === 'accepted' ? (
               <p className="text-[15.5px] text-forest">The buyer picked you at <strong className="num">{rs(mine.price_per_l)}/{perUnit(req.unit)}</strong>. It's in your bulk orders now.</p>

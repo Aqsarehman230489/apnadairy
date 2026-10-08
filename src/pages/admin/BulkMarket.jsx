@@ -20,7 +20,7 @@ const reqBadge = {
   open: ['green', 'Taking bids'], awarded: ['green', 'Covered'], closed: ['grey', 'Stopped'], cancelled: ['grey', 'Cancelled'], removed: ['red', 'Removed'],
 }
 const bidBadge = {
-  submitted: ['blue', 'Waiting for buyer'], accepted: ['green', 'Accepted'], not_selected: ['grey', 'Not selected'], withdrawn: ['grey', 'Withdrawn'], removed: ['red', 'Removed'],
+  submitted: ['blue', 'Waiting for buyer'], accepted: ['green', 'Accepted'], not_selected: ['grey', 'Not selected'], withdrawn: ['grey', 'Withdrawn'], cancelled: ['grey', 'Cancelled after acceptance'], removed: ['red', 'Removed'],
 }
 
 export default function BulkMarket() {

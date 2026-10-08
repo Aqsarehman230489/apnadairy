@@ -33,7 +33,7 @@ function TrackRecord({ r }) {
 
 function BidCard({ b, req, rank, canAccept, onAccept, busy, highlight }) {
   const Q = (n) => qtyText(n, req.unit)
-  const take = Math.min(Number(b.quantity_l), stillNeeded(req))
+  const take = Number(b.quantity_l)   // accepting orders the whole bid, even if that is more than still needed
   const diff = req.target_price ? Number(b.price_per_l) - Number(req.target_price) : null
   const issues = bidIssues(b, req)
   return (
@@ -70,7 +70,7 @@ function BidCard({ b, req, rank, canAccept, onAccept, busy, highlight }) {
       {b.notes && <p className="mt-3 text-[13.5px] text-muted">“{b.notes}”</p>}
 
       {canAccept && b.status === 'submitted' && (
-        <button className={`${rank ? 'btn-primary' : 'btn-secondary'} mt-5 w-full`} disabled={busy} onClick={() => onAccept(b, take)}>{take < Number(b.quantity_l) ? `Accept ${Q(take)} of this bid` : 'Accept this bid'}</button>
+        <button className={`${rank ? 'btn-primary' : 'btn-secondary'} mt-5 w-full`} disabled={busy} onClick={() => onAccept(b, take)}>Accept this bid</button>
       )}
     </article>
   )
@@ -90,7 +90,10 @@ export default function RequirementDetail() {
   const expired = isExpired(req)
   const isOpen = req.status === 'open' && !expired
   const biddingLive = isOpen && new Date(req.bid_deadline) > new Date()
-  const accepted = req.bids.filter((b) => b.status === 'accepted')
+  // orders that are still on (an order cancelled by either side no longer counts, and its bid shows as cancelled)
+  const liveOrders = (req.orders ?? []).filter((o) => o.status !== 'cancelled')
+  const accepted = req.bids.filter((b) => b.status === 'accepted' && liveOrders.some((o) => o.bid_id === b.id))
+  const cancelled = req.bids.filter((b) => b.status === 'cancelled' || (req.orders ?? []).some((o) => o.bid_id === b.id && o.status === 'cancelled'))
   const covered = coveredL(req), need = stillNeeded(req)
   const Q = (n) => qtyText(n, req.unit), per = perUnit(req.unit)
   const ladderRows = [...top, ...others].map((b) => ({
@@ -106,7 +109,7 @@ export default function RequirementDetail() {
     const rest = need - take
     const ok = await confirm({
       title: `Buy from ${b.center?.center_name}?`,
-      body: `${isMilk(req) && lowerGrade(b, req) ? `This is ${qualityLabel[offeredGrade(b, req)]} milk, not the ${qualityLabel[req.quality]} you asked for. ` : ''}${Q(take)}${isMilk(req) ? ` of ${qualityLabel[offeredGrade(b, req)].toLowerCase()} milk` : ''} at ${rs(b.price_per_l)} per ${per}, ${rs(b.price_per_l * take)} in total, delivered on ${date(b.delivery_date)}. ${rest > 0 ? `You still need ${Q(rest)}, so you can accept more bids after this.` : 'This covers your whole order, so the other bids will be declined.'} You pay the center directly on delivery.`,
+      body: `${isMilk(req) && lowerGrade(b, req) ? `This is ${qualityLabel[offeredGrade(b, req)]} milk, not the ${qualityLabel[req.quality]} you asked for. ` : ''}${Q(take)}${isMilk(req) ? ` of ${qualityLabel[offeredGrade(b, req)].toLowerCase()} milk` : ''} at ${rs(b.price_per_l)} per ${per}, ${rs(b.price_per_l * take)} in total, delivered on ${date(b.delivery_date)}. ${rest > 0 ? `You still need ${Q(rest)}, so you can accept more bids after this.` : `${rest < 0 ? `That is ${Q(-rest)} more than you still need. ` : ''}This covers your whole order, so the other bids will be declined.`} You pay the center directly on delivery.`,
       confirmLabel: 'Accept bid',
     })
     if (!ok) return
@@ -164,6 +167,15 @@ export default function RequirementDetail() {
             You're buying {accepted.map((a, i) => <span key={a.id}>{i > 0 && (i === accepted.length - 1 ? ' and ' : ', ')}<span className="num">{Q(Number((req.orders ?? []).find((o) => o.bid_id === a.id)?.quantity_l ?? a.quantity_l))}</span> from <strong>{a.center?.center_name}</strong> at <strong className="num text-haldi">{rs(a.price_per_l)}/{per}</strong></span>)}.
           </p>
           <Link to="/business/orders" className="btn-secondary btn-sm">Track the order</Link>
+        </div>
+      )}
+
+      {cancelled.length > 0 && (
+        <div className="mb-8 rounded-[20px] border border-line bg-cream px-5 py-4 text-[14px]">
+          {cancelled.map((b) => {
+            const o = (req.orders ?? []).find((x) => x.bid_id === b.id)
+            return <p key={b.id} className="text-muted"><Badge status="cancelled" dot={false}>Cancelled</Badge> <span className="ml-1"><strong className="text-ink">{b.center?.center_name}</strong>'s order of <span className="num">{Q(o?.quantity_l ?? b.quantity_l)}</span> was cancelled {o?.cancelled_by === 'business' ? 'by you' : 'by the seller'}. It no longer counts toward your order.</span></p>
+          })}
         </div>
       )}
 

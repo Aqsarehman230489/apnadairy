@@ -119,7 +119,7 @@ function DispatchFromStock({ order, onClose, onDone }) {
             ))}
           </dl>
           {ok ? <p className="rounded-2xl bg-mint-soft px-4 py-3 text-[13.5px] text-forest">The buyer sees this stock's grade, test time and freshness with the order.</p>
-            : <p className="rounded-2xl bg-[#f8e2dc] px-4 py-3 text-[13.5px] text-danger"><b>Not enough {gradeLabel[grade].toLowerCase()} milk in stock.</b> Buy and test more milk from your farmers, or cancel the order.</p>}
+            : <p className="rounded-2xl bg-[#f8e2dc] px-4 py-3 text-[13.5px] text-danger"><b>{qtyText(Math.ceil(Number(order.quantity_l) - have), 'litre')} short.</b> This order is for {qtyText(order.quantity_l, 'litre')} of {gradeLabel[grade].toLowerCase()} milk (the bid the buyer accepted), and your tested stock of that grade or better is {qtyText(Math.floor(have * 10) / 10, 'litre')}. Buy and test more milk from your farmers, or cancel the order.</p>}
         </div>
       )}
     </Sheet>

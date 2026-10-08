@@ -38,6 +38,9 @@ const one = (x) => (Array.isArray(x) ? x[0] ?? null : x ?? null)
 export const offeredGrade = (bid, req) => bid?.offered_quality ?? bid?.quality ?? req?.quality ?? 'standard'
 export const lowerGrade = (bid, req) => isMilk(req) && GRADES.indexOf(offeredGrade(bid, req)) < GRADES.indexOf(req?.quality ?? 'standard')
 
+// who cancelled an accepted bid's order, in words
+export const cancelledByText = (order, mine) => (order?.cancelled_by === 'business' ? 'The buyer cancelled this order' : mine ? 'You cancelled this order' : 'The seller cancelled this order')
+
 // a bid "qualifies" when it covers the quantity still needed, arrives on time and offers the grade asked for
 export function bidIssues(bid, req) {
   const issues = []
@@ -74,7 +77,7 @@ export async function myRequirements() {
 export async function requirementWithBids(id) {
   const { data, error } = await supabase
     .from('bulk_requirements')
-    .select(`*, bids(${BID_FIELDS}, center:area_managers(center_name, city)), orders:bulk_orders(id, bid_id, quantity_l, status)`)
+    .select(`*, bids(${BID_FIELDS}, center:area_managers(center_name, city)), orders:bulk_orders(id, bid_id, quantity_l, status, cancelled_by, quality)`)
     .eq('id', id)
     .single()
   if (error) throw error
@@ -109,10 +112,10 @@ export async function requestBoard() {
 export async function myBids() {
   const { data, error } = await supabase
     .from('bids')
-    .select(`${BID_FIELDS}, requirement:bulk_requirements(id, milk_type, product, unit, quantity_l, required_date, delivery_city, target_price, status, bid_deadline)`)
+    .select(`${BID_FIELDS}, requirement:bulk_requirements(id, milk_type, product, unit, quantity_l, required_date, delivery_city, target_price, status, bid_deadline), order:bulk_orders(id, status, cancelled_by)`)
     .order('updated_at', { ascending: false })
   if (error) throw error
-  return data
+  return data.map((b) => ({ ...b, order: one(b.order) }))
 }
 
 export async function requirementForCenter(id) {
@@ -123,10 +126,11 @@ export async function requirementForCenter(id) {
     .single()
   if (error) throw error
   const [{ data: bids }, { data: board }] = await Promise.all([
-    supabase.from('bids').select(BID_FIELDS).eq('requirement_id', id),
+    supabase.from('bids').select(`${BID_FIELDS}, order:bulk_orders(id, status, cancelled_by)`).eq('requirement_id', id),
     supabase.from('request_board').select('remaining_l').eq('id', id).maybeSingle(),
   ])
-  return { ...data, my_bid: bids?.[0] ?? null, remaining_l: board ? Number(board.remaining_l) : null }
+  const mine = bids?.[0] ?? null
+  return { ...data, my_bid: mine && { ...mine, order: one(mine.order) }, remaining_l: board ? Number(board.remaining_l) : null }
 }
 
 export async function centerOrders() {

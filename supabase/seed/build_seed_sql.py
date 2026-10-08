@@ -27,8 +27,9 @@ def main():
             'approved_h': round(f['approved_h'], 2) if f['approved_h'] is not None else None,
         })
     data = json.dumps(rows, ensure_ascii=False, indent=0).replace("'", "''")
-    sql = f"""-- farmers who signed up in the ApnaDairy app: {len(rows)} farmers in 7 cities (Lahore, Faisalabad, Sialkot, Islamabad,
--- Rawalpindi, Multan, Gujranwala). made with supabase/seed/make_farmers.py; names, phones and cnic numbers are made up and
+    sql = f"""-- farmers who signed up in the ApnaDairy app: {len(rows)} farmers in {len({r['city'] for r in rows})} cities:
+-- {', '.join(sorted({r['city'] for r in rows}))}.
+-- made with supabase/seed/make_farmers.py; names, phones and cnic numbers are made up and
 -- the pictures (public/farmers/) are drawn.
 -- run after 45_farmer_app.sql, once the super admin exists. safe to run again (farmers already there are skipped).
 --   approved: {sum(r['status'] == 'active' for r in rows)}, each asks a milk center in their own city as soon as one is approved

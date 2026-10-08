@@ -80,9 +80,87 @@ def main():
         f['sent_h'] = f['joined_h'] - R.randint(0, 6) * 0 - R.uniform(0.1, 3)
         f['approved_h'] = f['sent_h'] - R.uniform(20, 160) if f['status'] == 'active' else f['sent_h'] - R.uniform(5, 30) if f['status'] == 'rejected' else None
         f['seed'] = R.randint(1, 10**9)
+    out += more_cities(len(out), used_phones, {f['full_name'] for f in out})
     (ROOT / 'supabase' / 'seed' / 'farmers.json').write_text(json.dumps(out, indent=1, ensure_ascii=False))
     print(len(out), 'farmers', {s: sum(f['status'] == s for f in out) for s in ('active', 'pending', 'rejected')},
           'women', sum(f['female'] for f in out))
+
+# ---------- 18 more cities, 6 farmers each (added later; the first 70 farmers above stay exactly the same) ----------
+MORE = {
+    'Karachi':         (24.86, 67.01, '42101', 'sindh', ['Bhains Colony', 'Landhi', 'Malir', 'Gadap Town', 'Memon Goth', 'Shah Latif Town']),
+    'Hyderabad':       (25.39, 68.37, '41304', 'sindh', ['Tando Jam', 'Hatri', 'Husri', 'Moosa Khatian', 'Tando Qaiser', 'Kotri']),
+    'Sukkur':          (27.70, 68.86, '45504', 'sindh', ['Rohri', 'Pano Aqil', 'Salehpat', 'New Sukkur', 'Arore', 'Baiji']),
+    'Peshawar':        (34.01, 71.58, '17301', 'kp', ['Pabbi', 'Chamkani', 'Badaber', 'Mattani', 'Pishtakhara', 'Regi']),
+    'Mardan':          (34.20, 72.04, '16101', 'kp', ['Takht Bhai', 'Katlang', 'Shergarh', 'Rustam', 'Garhi Kapura', 'Lund Khwar']),
+    'Abbottabad':      (34.15, 73.22, '13101', 'hazara', ['Havelian', 'Nawanshehr', 'Qalandarabad', 'Sherwan', 'Dhamtour', 'Bagnotar']),
+    'Quetta':          (30.18, 66.98, '54400', 'baloch', ['Kuchlak', 'Hanna Urak', 'Saryab', 'Nawa Killi', 'Pishin Road', 'Spin Karez']),
+    'Sargodha':        (32.08, 72.67, '38403', 'punjab', ['Bhalwal', 'Kot Momin', 'Sillanwali', 'Chak 46 SB', 'Shahpur', 'Jhawarian']),
+    'Bahawalpur':      (29.40, 71.68, '31202', 'south', ['Hasilpur', 'Yazman', 'Khairpur Tamewali', 'Ahmedpur East', 'Uch Sharif', 'Head Rajkan']),
+    'Sahiwal':         (30.66, 73.11, '36502', 'punjab', ['Chichawatni', 'Harappa', 'Noorshah', 'Kameer', 'Chak 89/6R', 'Iqbal Nagar']),
+    'Okara':           (30.81, 73.46, '35302', 'punjab', ['Renala Khurd', 'Depalpur', 'Haveli Lakha', 'Hujra Shah Muqeem', 'Basirpur', 'Satghara']),
+    'Sheikhupura':     (31.71, 73.98, '35404', 'punjab', ['Muridke', 'Ferozewala', 'Safdarabad', 'Farooqabad', 'Sharaqpur', 'Narang Mandi']),
+    'Kasur':           (31.12, 74.45, '35102', 'punjab', ['Pattoki', 'Chunian', 'Kot Radha Kishan', 'Mustafabad', 'Khudian', 'Ganda Singh Wala']),
+    'Gujrat':          (32.57, 74.08, '34201', 'punjab', ['Kharian', 'Lalamusa', 'Sarai Alamgir', 'Jalalpur Jattan', 'Kunjah', 'Dinga']),
+    'Jhelum':          (32.94, 73.73, '37301', 'pothohar', ['Dina', 'Sohawa', 'Pind Dadan Khan', 'Domeli', 'Khewra', 'Kala Gujran']),
+    'Chakwal':         (32.93, 72.86, '37201', 'pothohar', ['Kallar Kahar', 'Choa Saidan Shah', 'Talagang', 'Dhudial', 'Balkassar', 'Mulhal Mughlan']),
+    'Rahim Yar Khan':  (28.42, 70.30, '31303', 'south', ['Sadiqabad', 'Khanpur', 'Liaquatpur', 'Zahir Pir', 'Kot Samaba', 'Iqbalabad']),
+    'Dera Ghazi Khan': (30.06, 70.63, '32102', 'south', ['Kot Chutta', 'Taunsa', 'Choti Zareen', 'Shadan Lund', 'Vehova', 'Sakhi Sarwar']),
+}
+FIRST = ['Muhammad Akram', 'Ghulam Haider', 'Abdul Sattar', 'Muhammad Iqbal', 'Ghulam Qadir', 'Abdul Majeed', 'Muhammad Siddique',
+         'Allah Bakhsh', 'Khuda Bakhsh', 'Muhammad Ramzan', 'Muhammad Hanif', 'Abdul Hameed', 'Muhammad Afzal', 'Muhammad Shafi',
+         'Gul Muhammad', 'Sher Muhammad', 'Muhammad Ilyas', 'Abdul Qayyum', 'Muhammad Anwar', 'Muhammad Jameel', 'Nazir Ahmad',
+         'Muhammad Sabir', 'Muhammad Akhtar', 'Abdul Latif', 'Muhammad Zubair', 'Muhammad Farooq', 'Muhammad Imran', 'Muhammad Bilal',
+         'Habib Ullah', 'Rahim Bakhsh', 'Wali Muhammad', 'Muhammad Younas', 'Abdul Haq', 'Muhammad Arif', 'Muhammad Shoaib']
+SURNAMES = {
+    'sindh': ['Soomro', 'Memon', 'Jatoi', 'Chandio', 'Lashari', 'Shaikh', 'Abro', 'Mangi'],
+    'kp': ['Khan', 'Afridi', 'Yousafzai', 'Khattak', 'Mohmand', 'Shinwari'],
+    'hazara': ['Abbasi', 'Jadoon', 'Tanoli', 'Awan', 'Qureshi'],
+    'baloch': ['Kakar', 'Achakzai', 'Baloch', 'Tareen', 'Mengal'],
+    'punjab': ['Jutt', 'Bhatti', 'Gondal', 'Cheema', 'Arain', 'Sial', 'Dogar', 'Kharal', 'Watto'],
+    'pothohar': ['Awan', 'Janjua', 'Raja', 'Mughal', 'Kayani', 'Minhas'],
+    'south': ['Joiya', 'Lound', 'Khosa', 'Leghari', 'Dreshak', 'Laar', 'Wains'],
+}
+WOMEN_FIRST = ['Hajran Bibi', 'Ameer Khatoon', 'Sakina Bibi', 'Noor Jahan', 'Bashiran Bibi', 'Hameeda Begum', 'Mumtaz Bibi', 'Khursheed Begum',
+               'Rukhsana Bibi', 'Bilqees Bibi']
+
+
+def more_cities(start, used_phones, used_names):
+    r = random.Random(20261009)
+    out, n = [], start
+    for city, (lat, lng, code, region, villages) in MORE.items():
+        for i in range(6):
+            n += 1
+            female = r.random() < 0.15
+            while True:
+                name = r.choice(WOMEN_FIRST) if female else f"{r.choice(FIRST)} {r.choice(SURNAMES[region])}"
+                if name not in used_names: break
+                if female: female = False
+            used_names.add(name)
+            age = r.randint(24, 68)
+            p = phone()
+            while p in used_phones: p = phone()
+            used_phones.add(p)
+            milk = r.choices(['buffalo', 'mixed', 'cow'], [30, 30, 40] if region in ('kp', 'hazara', 'baloch') else [55, 25, 20])[0]
+            cattle = r.choice([2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25])
+            litres = round(cattle * {'buffalo': 7, 'cow': 10, 'mixed': 8}[milk] * r.uniform(0.55, 0.8))
+            village = villages[i]
+            status = 'active' if i < 4 else 'pending'
+            joined = r.randint(240, 720) if status == 'active' else r.randint(2, 70)
+            sent = joined - r.uniform(0.1, 3)
+            out.append({
+                'slug': f"f{n:03d}", 'full_name': name, 'female': female, 'age': age, 'phone': p,
+                'cnic': f"{code}-{r.randint(1000000, 9999999)}-{r.choice([2,4,6,8]) if female else r.choice([1,3,5,7,9])}",
+                'city': city, 'village': village,
+                'address': r.choice(['Near Jamia Masjid', 'Main bazaar road', 'Near government school', 'Behind the union council office',
+                                     'Near the BHU dispensary', 'Dera next to the tube well']) + f", {village}",
+                'lat': round(lat + r.uniform(-0.1, 0.1), 5), 'lng': round(lng + r.uniform(-0.1, 0.1), 5),
+                'farm_name': r.choice(FARMS).format(s=name.split()[-1]) if r.random() < 0.45 else None,
+                'milk_type': milk, 'cattle': cattle, 'litres': litres, 'notes': r.choice(NOTES) if r.random() < 0.7 else None,
+                'status': status, 'reject_reason': None, 'joined_h': joined, 'sent_h': sent,
+                'approved_h': sent - r.uniform(20, 160) if status == 'active' else None, 'seed': r.randint(1, 10**9),
+            })
+    return out
+
 
 if __name__ == '__main__':
     main()

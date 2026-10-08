@@ -60,9 +60,25 @@ export default function Users() {
     load()
   }
 
+  // delete for good: the email is free to sign up again
+  const remove = async (u) => {
+    const ok = await confirm({
+      title: `Delete ${u.full_name}'s account?`,
+      body: `This permanently deletes ${u.email} and everything it has: ${u.center ? `${u.center.center_name}, its farmers, milk, stock, listings, ` : ''}orders, bids, bills and notifications. It cannot be undone. The same email can sign up again afterwards.`,
+      confirmLabel: 'Delete permanently', danger: true,
+    })
+    if (!ok) return
+    setBusy(u.id)
+    const { error } = await supabase.rpc('delete_account', { p_user: u.id })
+    setBusy(null)
+    if (error) return toast(error.message, 'error')
+    toast(`${u.full_name}'s account was deleted. ${u.email} can sign up again.`)
+    load()
+  }
+
   return (
     <>
-      <PageHeader title="Users" description="Everyone with an ApnaDairy account. Suspend or reactivate accounts here; new admins are created on the Admins page." />
+      <PageHeader title="Users" description="Everyone with an ApnaDairy account. Suspend, reactivate or delete accounts here; new admins are created on the Admins page." />
 
 
       <div className="mb-4 flex flex-wrap items-center gap-3">
@@ -118,6 +134,9 @@ export default function Users() {
                       ))}
                       {['pending', 'rejected'].includes(u.status) && (
                         <span className="text-[13px] text-muted">Use Approvals</span>
+                      )}
+                      {!isMe && !isAdmin && (
+                        <button className="btn-ghost btn-sm text-danger" onClick={() => remove(u)}>Delete</button>
                       )}
                     </div>
                   </td>

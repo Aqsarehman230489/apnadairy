@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react'
 import Loader from './components/Loader'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
+import RecoveryRedirect from './components/RecoveryRedirect'
 import { UiProvider } from './context/UiContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import ModuleSoon from './components/ModuleSoon'
@@ -62,6 +63,7 @@ export default function App() {
     <AuthProvider>
       <UiProvider>
       <BrowserRouter>
+        <RecoveryRedirect />
         <Suspense fallback={<Loader />}>
         <Routes>
           <Route path="/" element={<Home />} />

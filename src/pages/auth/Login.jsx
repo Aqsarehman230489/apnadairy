@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, Navigate } from 'react-router-dom'
+import { Link, Navigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
 import { homeFor } from '../../lib/roles'
@@ -10,6 +10,7 @@ import ResendConfirmation from '../../components/ResendConfirmation'
 
 export default function Login() {
   const { session, profile } = useAuth()
+  const [params] = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -40,6 +41,7 @@ export default function Login() {
       <GoogleButton onError={setError} />
       <OrLine />
       <form onSubmit={onSubmit} className="flex flex-col gap-4">
+        {params.get('reset') && !error && <Alert type="success">Your password is changed. Sign in with the new one.</Alert>}
         <Alert>{error}</Alert>
         {unconfirmed && <ResendConfirmation email={email.trim().toLowerCase()} className="-mt-2 text-[14px]" />}
         <div className="field">

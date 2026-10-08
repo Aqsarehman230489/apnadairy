@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { supabase } from '../../lib/supabase'
+import { supabase, RECOVERY_KEY } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
 import { homeFor } from '../../lib/roles'
 import AuthShell from '../../components/AuthShell'
@@ -35,8 +35,9 @@ export default function ResetPassword({ invite = false }) {
     const { error } = await supabase.auth.updateUser({ password: pw })
     setBusy(false)
     if (error) return setError(error.message)
+    try { sessionStorage.removeItem(RECOVERY_KEY) } catch { /* ignore */ }
     if (invite) { await refreshProfile(); nav(homeFor(profile?.role ?? 'super_admin'), { replace: true }) }
-    else nav('/login', { replace: true })
+    else { await supabase.auth.signOut(); nav('/login?reset=1', { replace: true }) }
   }
 
   return (
